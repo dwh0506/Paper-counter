@@ -1,0 +1,510 @@
+C51 COMPILER V9.55   STC8EEPROM                                                            10/16/2019 15:57:43 PAGE 1   
+
+
+C51 COMPILER V9.55, COMPILATION OF MODULE STC8EEPROM
+OBJECT MODULE PLACED IN .\Objects\STC8EEPROM.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\SYSTEM\STC8EEPROM.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\SYSTEM;..\HARD
+                    -WARE;..\USER) DEBUG OBJECTEXTEND PRINT(.\Listings\STC8EEPROM.lst) TABS(2) OBJECT(.\Objects\STC8EEPROM.obj)
+
+line level    source
+
+   1          #include  "STC8EEPROM.h"
+   2          #include  "intrins.h"
+   3          #include  "STC8.h"
+   4          #include  "Serial.h"//´®¿Ú1(P3.0/RxD, P3.1/TxD)
+*** ERROR C231 IN LINE 16 OF ..\SYSTEM\STC15F2K60S2.h: 'ACC': redefinition
+*** ERROR C231 IN LINE 17 OF ..\SYSTEM\STC15F2K60S2.h: 'B': redefinition
+*** ERROR C231 IN LINE 18 OF ..\SYSTEM\STC15F2K60S2.h: 'PSW': redefinition
+*** ERROR C231 IN LINE 19 OF ..\SYSTEM\STC15F2K60S2.h: 'CY': redefinition
+*** ERROR C231 IN LINE 20 OF ..\SYSTEM\STC15F2K60S2.h: 'AC': redefinition
+*** ERROR C231 IN LINE 21 OF ..\SYSTEM\STC15F2K60S2.h: 'F0': redefinition
+*** ERROR C231 IN LINE 22 OF ..\SYSTEM\STC15F2K60S2.h: 'RS1': redefinition
+*** ERROR C231 IN LINE 23 OF ..\SYSTEM\STC15F2K60S2.h: 'RS0': redefinition
+*** ERROR C231 IN LINE 24 OF ..\SYSTEM\STC15F2K60S2.h: 'OV': redefinition
+*** ERROR C231 IN LINE 25 OF ..\SYSTEM\STC15F2K60S2.h: 'P': redefinition
+*** ERROR C231 IN LINE 26 OF ..\SYSTEM\STC15F2K60S2.h: 'SP': redefinition
+*** ERROR C231 IN LINE 27 OF ..\SYSTEM\STC15F2K60S2.h: 'DPL': redefinition
+*** ERROR C231 IN LINE 28 OF ..\SYSTEM\STC15F2K60S2.h: 'DPH': redefinition
+*** ERROR C231 IN LINE 31 OF ..\SYSTEM\STC15F2K60S2.h: 'P0': redefinition
+*** ERROR C231 IN LINE 32 OF ..\SYSTEM\STC15F2K60S2.h: 'P00': redefinition
+*** ERROR C231 IN LINE 33 OF ..\SYSTEM\STC15F2K60S2.h: 'P01': redefinition
+*** ERROR C231 IN LINE 34 OF ..\SYSTEM\STC15F2K60S2.h: 'P02': redefinition
+*** ERROR C231 IN LINE 35 OF ..\SYSTEM\STC15F2K60S2.h: 'P03': redefinition
+*** ERROR C231 IN LINE 36 OF ..\SYSTEM\STC15F2K60S2.h: 'P04': redefinition
+*** ERROR C231 IN LINE 37 OF ..\SYSTEM\STC15F2K60S2.h: 'P05': redefinition
+*** ERROR C231 IN LINE 38 OF ..\SYSTEM\STC15F2K60S2.h: 'P06': redefinition
+*** ERROR C231 IN LINE 39 OF ..\SYSTEM\STC15F2K60S2.h: 'P07': redefinition
+*** ERROR C231 IN LINE 40 OF ..\SYSTEM\STC15F2K60S2.h: 'P1': redefinition
+*** ERROR C231 IN LINE 41 OF ..\SYSTEM\STC15F2K60S2.h: 'P10': redefinition
+*** ERROR C231 IN LINE 42 OF ..\SYSTEM\STC15F2K60S2.h: 'P11': redefinition
+*** ERROR C231 IN LINE 43 OF ..\SYSTEM\STC15F2K60S2.h: 'P12': redefinition
+*** ERROR C231 IN LINE 44 OF ..\SYSTEM\STC15F2K60S2.h: 'P13': redefinition
+*** ERROR C231 IN LINE 45 OF ..\SYSTEM\STC15F2K60S2.h: 'P14': redefinition
+*** ERROR C231 IN LINE 46 OF ..\SYSTEM\STC15F2K60S2.h: 'P15': redefinition
+*** ERROR C231 IN LINE 47 OF ..\SYSTEM\STC15F2K60S2.h: 'P16': redefinition
+*** ERROR C231 IN LINE 48 OF ..\SYSTEM\STC15F2K60S2.h: 'P17': redefinition
+*** ERROR C231 IN LINE 49 OF ..\SYSTEM\STC15F2K60S2.h: 'P2': redefinition
+*** ERROR C231 IN LINE 50 OF ..\SYSTEM\STC15F2K60S2.h: 'P20': redefinition
+*** ERROR C231 IN LINE 51 OF ..\SYSTEM\STC15F2K60S2.h: 'P21': redefinition
+*** ERROR C231 IN LINE 52 OF ..\SYSTEM\STC15F2K60S2.h: 'P22': redefinition
+*** ERROR C231 IN LINE 53 OF ..\SYSTEM\STC15F2K60S2.h: 'P23': redefinition
+*** ERROR C231 IN LINE 54 OF ..\SYSTEM\STC15F2K60S2.h: 'P24': redefinition
+*** ERROR C231 IN LINE 55 OF ..\SYSTEM\STC15F2K60S2.h: 'P25': redefinition
+*** ERROR C231 IN LINE 56 OF ..\SYSTEM\STC15F2K60S2.h: 'P26': redefinition
+*** ERROR C231 IN LINE 57 OF ..\SYSTEM\STC15F2K60S2.h: 'P27': redefinition
+*** ERROR C231 IN LINE 58 OF ..\SYSTEM\STC15F2K60S2.h: 'P3': redefinition
+*** ERROR C231 IN LINE 59 OF ..\SYSTEM\STC15F2K60S2.h: 'P30': redefinition
+*** ERROR C231 IN LINE 60 OF ..\SYSTEM\STC15F2K60S2.h: 'P31': redefinition
+*** ERROR C231 IN LINE 61 OF ..\SYSTEM\STC15F2K60S2.h: 'P32': redefinition
+*** ERROR C231 IN LINE 62 OF ..\SYSTEM\STC15F2K60S2.h: 'P33': redefinition
+*** ERROR C231 IN LINE 63 OF ..\SYSTEM\STC15F2K60S2.h: 'P34': redefinition
+*** ERROR C231 IN LINE 64 OF ..\SYSTEM\STC15F2K60S2.h: 'P35': redefinition
+*** ERROR C231 IN LINE 65 OF ..\SYSTEM\STC15F2K60S2.h: 'P36': redefinition
+*** ERROR C231 IN LINE 66 OF ..\SYSTEM\STC15F2K60S2.h: 'P37': redefinition
+*** ERROR C231 IN LINE 67 OF ..\SYSTEM\STC15F2K60S2.h: 'P4': redefinition
+C51 COMPILER V9.55   STC8EEPROM                                                            10/16/2019 15:57:43 PAGE 2   
+
+*** ERROR C231 IN LINE 68 OF ..\SYSTEM\STC15F2K60S2.h: 'P40': redefinition
+*** ERROR C231 IN LINE 69 OF ..\SYSTEM\STC15F2K60S2.h: 'P41': redefinition
+*** ERROR C231 IN LINE 70 OF ..\SYSTEM\STC15F2K60S2.h: 'P42': redefinition
+*** ERROR C231 IN LINE 71 OF ..\SYSTEM\STC15F2K60S2.h: 'P43': redefinition
+*** ERROR C231 IN LINE 72 OF ..\SYSTEM\STC15F2K60S2.h: 'P44': redefinition
+*** ERROR C231 IN LINE 73 OF ..\SYSTEM\STC15F2K60S2.h: 'P45': redefinition
+*** ERROR C231 IN LINE 74 OF ..\SYSTEM\STC15F2K60S2.h: 'P46': redefinition
+*** ERROR C231 IN LINE 75 OF ..\SYSTEM\STC15F2K60S2.h: 'P47': redefinition
+*** ERROR C231 IN LINE 76 OF ..\SYSTEM\STC15F2K60S2.h: 'P5': redefinition
+*** ERROR C231 IN LINE 77 OF ..\SYSTEM\STC15F2K60S2.h: 'P50': redefinition
+*** ERROR C231 IN LINE 78 OF ..\SYSTEM\STC15F2K60S2.h: 'P51': redefinition
+*** ERROR C231 IN LINE 79 OF ..\SYSTEM\STC15F2K60S2.h: 'P52': redefinition
+*** ERROR C231 IN LINE 80 OF ..\SYSTEM\STC15F2K60S2.h: 'P53': redefinition
+*** ERROR C231 IN LINE 81 OF ..\SYSTEM\STC15F2K60S2.h: 'P54': redefinition
+*** ERROR C231 IN LINE 82 OF ..\SYSTEM\STC15F2K60S2.h: 'P55': redefinition
+*** ERROR C231 IN LINE 83 OF ..\SYSTEM\STC15F2K60S2.h: 'P56': redefinition
+*** ERROR C231 IN LINE 84 OF ..\SYSTEM\STC15F2K60S2.h: 'P57': redefinition
+*** ERROR C231 IN LINE 85 OF ..\SYSTEM\STC15F2K60S2.h: 'P6': redefinition
+*** ERROR C231 IN LINE 86 OF ..\SYSTEM\STC15F2K60S2.h: 'P60': redefinition
+*** ERROR C231 IN LINE 87 OF ..\SYSTEM\STC15F2K60S2.h: 'P61': redefinition
+*** ERROR C231 IN LINE 88 OF ..\SYSTEM\STC15F2K60S2.h: 'P62': redefinition
+*** ERROR C231 IN LINE 89 OF ..\SYSTEM\STC15F2K60S2.h: 'P63': redefinition
+*** ERROR C231 IN LINE 90 OF ..\SYSTEM\STC15F2K60S2.h: 'P64': redefinition
+*** ERROR C231 IN LINE 91 OF ..\SYSTEM\STC15F2K60S2.h: 'P65': redefinition
+*** ERROR C231 IN LINE 92 OF ..\SYSTEM\STC15F2K60S2.h: 'P66': redefinition
+*** ERROR C231 IN LINE 93 OF ..\SYSTEM\STC15F2K60S2.h: 'P67': redefinition
+*** ERROR C231 IN LINE 94 OF ..\SYSTEM\STC15F2K60S2.h: 'P7': redefinition
+*** ERROR C231 IN LINE 95 OF ..\SYSTEM\STC15F2K60S2.h: 'P70': redefinition
+*** ERROR C231 IN LINE 96 OF ..\SYSTEM\STC15F2K60S2.h: 'P71': redefinition
+*** ERROR C231 IN LINE 97 OF ..\SYSTEM\STC15F2K60S2.h: 'P72': redefinition
+*** ERROR C231 IN LINE 98 OF ..\SYSTEM\STC15F2K60S2.h: 'P73': redefinition
+*** ERROR C231 IN LINE 99 OF ..\SYSTEM\STC15F2K60S2.h: 'P74': redefinition
+*** ERROR C231 IN LINE 100 OF ..\SYSTEM\STC15F2K60S2.h: 'P75': redefinition
+*** ERROR C231 IN LINE 101 OF ..\SYSTEM\STC15F2K60S2.h: 'P76': redefinition
+*** ERROR C231 IN LINE 102 OF ..\SYSTEM\STC15F2K60S2.h: 'P77': redefinition
+*** ERROR C231 IN LINE 103 OF ..\SYSTEM\STC15F2K60S2.h: 'P0M0': redefinition
+*** ERROR C231 IN LINE 104 OF ..\SYSTEM\STC15F2K60S2.h: 'P0M1': redefinition
+*** ERROR C231 IN LINE 105 OF ..\SYSTEM\STC15F2K60S2.h: 'P1M0': redefinition
+*** ERROR C231 IN LINE 106 OF ..\SYSTEM\STC15F2K60S2.h: 'P1M1': redefinition
+*** ERROR C231 IN LINE 107 OF ..\SYSTEM\STC15F2K60S2.h: 'P2M0': redefinition
+*** ERROR C231 IN LINE 108 OF ..\SYSTEM\STC15F2K60S2.h: 'P2M1': redefinition
+*** ERROR C231 IN LINE 109 OF ..\SYSTEM\STC15F2K60S2.h: 'P3M0': redefinition
+*** ERROR C231 IN LINE 110 OF ..\SYSTEM\STC15F2K60S2.h: 'P3M1': redefinition
+*** ERROR C231 IN LINE 111 OF ..\SYSTEM\STC15F2K60S2.h: 'P4M0': redefinition
+*** ERROR C231 IN LINE 112 OF ..\SYSTEM\STC15F2K60S2.h: 'P4M1': redefinition
+*** ERROR C231 IN LINE 113 OF ..\SYSTEM\STC15F2K60S2.h: 'P5M0': redefinition
+*** ERROR C231 IN LINE 114 OF ..\SYSTEM\STC15F2K60S2.h: 'P5M1': redefinition
+*** ERROR C231 IN LINE 115 OF ..\SYSTEM\STC15F2K60S2.h: 'P6M0': redefinition
+*** ERROR C231 IN LINE 116 OF ..\SYSTEM\STC15F2K60S2.h: 'P6M1': redefinition
+*** ERROR C231 IN LINE 117 OF ..\SYSTEM\STC15F2K60S2.h: 'P7M0': redefinition
+*** ERROR C231 IN LINE 118 OF ..\SYSTEM\STC15F2K60S2.h: 'P7M1': redefinition
+*** ERROR C231 IN LINE 121 OF ..\SYSTEM\STC15F2K60S2.h: 'PCON': redefinition
+*** ERROR C231 IN LINE 122 OF ..\SYSTEM\STC15F2K60S2.h: 'AUXR': redefinition
+*** ERROR C231 IN LINE 124 OF ..\SYSTEM\STC15F2K60S2.h: 'P_SW1': redefinition
+*** ERROR C231 IN LINE 126 OF ..\SYSTEM\STC15F2K60S2.h: 'BUS_SPEED': redefinition
+*** ERROR C231 IN LINE 128 OF ..\SYSTEM\STC15F2K60S2.h: 'P_SW2': redefinition
+*** ERROR C231 IN LINE 131 OF ..\SYSTEM\STC15F2K60S2.h: 'IE': redefinition
+*** ERROR C231 IN LINE 132 OF ..\SYSTEM\STC15F2K60S2.h: 'EA': redefinition
+*** ERROR C231 IN LINE 133 OF ..\SYSTEM\STC15F2K60S2.h: 'ELVD': redefinition
+*** ERROR C231 IN LINE 134 OF ..\SYSTEM\STC15F2K60S2.h: 'EADC': redefinition
+*** ERROR C231 IN LINE 135 OF ..\SYSTEM\STC15F2K60S2.h: 'ES': redefinition
+*** ERROR C231 IN LINE 136 OF ..\SYSTEM\STC15F2K60S2.h: 'ET1': redefinition
+C51 COMPILER V9.55   STC8EEPROM                                                            10/16/2019 15:57:43 PAGE 3   
+
+*** ERROR C231 IN LINE 137 OF ..\SYSTEM\STC15F2K60S2.h: 'EX1': redefinition
+*** ERROR C231 IN LINE 138 OF ..\SYSTEM\STC15F2K60S2.h: 'ET0': redefinition
+*** ERROR C231 IN LINE 139 OF ..\SYSTEM\STC15F2K60S2.h: 'EX0': redefinition
+*** ERROR C231 IN LINE 140 OF ..\SYSTEM\STC15F2K60S2.h: 'IP': redefinition
+*** ERROR C231 IN LINE 141 OF ..\SYSTEM\STC15F2K60S2.h: 'PPCA': redefinition
+*** ERROR C231 IN LINE 142 OF ..\SYSTEM\STC15F2K60S2.h: 'PLVD': redefinition
+*** ERROR C231 IN LINE 143 OF ..\SYSTEM\STC15F2K60S2.h: 'PADC': redefinition
+*** ERROR C231 IN LINE 144 OF ..\SYSTEM\STC15F2K60S2.h: 'PS': redefinition
+*** ERROR C231 IN LINE 145 OF ..\SYSTEM\STC15F2K60S2.h: 'PT1': redefinition
+*** ERROR C231 IN LINE 146 OF ..\SYSTEM\STC15F2K60S2.h: 'PX1': redefinition
+*** ERROR C231 IN LINE 147 OF ..\SYSTEM\STC15F2K60S2.h: 'PT0': redefinition
+*** ERROR C231 IN LINE 148 OF ..\SYSTEM\STC15F2K60S2.h: 'PX0': redefinition
+*** ERROR C231 IN LINE 149 OF ..\SYSTEM\STC15F2K60S2.h: 'IE2': redefinition
+*** ERROR C231 IN LINE 150 OF ..\SYSTEM\STC15F2K60S2.h: 'IP2': redefinition
+*** ERROR C231 IN LINE 154 OF ..\SYSTEM\STC15F2K60S2.h: 'TCON': redefinition
+*** ERROR C231 IN LINE 155 OF ..\SYSTEM\STC15F2K60S2.h: 'TF1': redefinition
+*** ERROR C231 IN LINE 156 OF ..\SYSTEM\STC15F2K60S2.h: 'TR1': redefinition
+*** ERROR C231 IN LINE 157 OF ..\SYSTEM\STC15F2K60S2.h: 'TF0': redefinition
+*** ERROR C231 IN LINE 158 OF ..\SYSTEM\STC15F2K60S2.h: 'TR0': redefinition
+*** ERROR C231 IN LINE 159 OF ..\SYSTEM\STC15F2K60S2.h: 'IE1': redefinition
+*** ERROR C231 IN LINE 160 OF ..\SYSTEM\STC15F2K60S2.h: 'IT1': redefinition
+*** ERROR C231 IN LINE 161 OF ..\SYSTEM\STC15F2K60S2.h: 'IE0': redefinition
+*** ERROR C231 IN LINE 162 OF ..\SYSTEM\STC15F2K60S2.h: 'IT0': redefinition
+*** ERROR C231 IN LINE 163 OF ..\SYSTEM\STC15F2K60S2.h: 'TMOD': redefinition
+*** ERROR C231 IN LINE 164 OF ..\SYSTEM\STC15F2K60S2.h: 'TL0': redefinition
+*** ERROR C231 IN LINE 165 OF ..\SYSTEM\STC15F2K60S2.h: 'TL1': redefinition
+*** ERROR C231 IN LINE 166 OF ..\SYSTEM\STC15F2K60S2.h: 'TH0': redefinition
+*** ERROR C231 IN LINE 167 OF ..\SYSTEM\STC15F2K60S2.h: 'TH1': redefinition
+*** ERROR C231 IN LINE 168 OF ..\SYSTEM\STC15F2K60S2.h: 'T4T3M': redefinition
+*** ERROR C231 IN LINE 170 OF ..\SYSTEM\STC15F2K60S2.h: 'T4H': redefinition
+*** ERROR C231 IN LINE 171 OF ..\SYSTEM\STC15F2K60S2.h: 'T4L': redefinition
+*** ERROR C231 IN LINE 172 OF ..\SYSTEM\STC15F2K60S2.h: 'T3H': redefinition
+*** ERROR C231 IN LINE 173 OF ..\SYSTEM\STC15F2K60S2.h: 'T3L': redefinition
+*** ERROR C231 IN LINE 174 OF ..\SYSTEM\STC15F2K60S2.h: 'T2H': redefinition
+*** ERROR C231 IN LINE 175 OF ..\SYSTEM\STC15F2K60S2.h: 'T2L': redefinition
+*** ERROR C231 IN LINE 176 OF ..\SYSTEM\STC15F2K60S2.h: 'WKTCL': redefinition
+*** ERROR C231 IN LINE 177 OF ..\SYSTEM\STC15F2K60S2.h: 'WKTCH': redefinition
+*** ERROR C231 IN LINE 178 OF ..\SYSTEM\STC15F2K60S2.h: 'WDT_CONTR': redefinition
+*** ERROR C231 IN LINE 181 OF ..\SYSTEM\STC15F2K60S2.h: 'SCON': redefinition
+*** ERROR C231 IN LINE 182 OF ..\SYSTEM\STC15F2K60S2.h: 'SM0': redefinition
+*** ERROR C231 IN LINE 183 OF ..\SYSTEM\STC15F2K60S2.h: 'SM1': redefinition
+*** ERROR C231 IN LINE 184 OF ..\SYSTEM\STC15F2K60S2.h: 'SM2': redefinition
+*** ERROR C231 IN LINE 185 OF ..\SYSTEM\STC15F2K60S2.h: 'REN': redefinition
+*** ERROR C231 IN LINE 186 OF ..\SYSTEM\STC15F2K60S2.h: 'TB8': redefinition
+*** ERROR C231 IN LINE 187 OF ..\SYSTEM\STC15F2K60S2.h: 'RB8': redefinition
+*** ERROR C231 IN LINE 188 OF ..\SYSTEM\STC15F2K60S2.h: 'TI': redefinition
+*** ERROR C231 IN LINE 189 OF ..\SYSTEM\STC15F2K60S2.h: 'RI': redefinition
+*** ERROR C231 IN LINE 190 OF ..\SYSTEM\STC15F2K60S2.h: 'SBUF': redefinition
+*** ERROR C231 IN LINE 191 OF ..\SYSTEM\STC15F2K60S2.h: 'S2CON': redefinition
+*** ERROR C231 IN LINE 192 OF ..\SYSTEM\STC15F2K60S2.h: 'S2BUF': redefinition
+*** ERROR C231 IN LINE 193 OF ..\SYSTEM\STC15F2K60S2.h: 'S3CON': redefinition
+*** ERROR C231 IN LINE 194 OF ..\SYSTEM\STC15F2K60S2.h: 'S3BUF': redefinition
+*** ERROR C231 IN LINE 195 OF ..\SYSTEM\STC15F2K60S2.h: 'S4CON': redefinition
+*** ERROR C231 IN LINE 196 OF ..\SYSTEM\STC15F2K60S2.h: 'S4BUF': redefinition
+*** ERROR C231 IN LINE 197 OF ..\SYSTEM\STC15F2K60S2.h: 'SADDR': redefinition
+*** ERROR C231 IN LINE 198 OF ..\SYSTEM\STC15F2K60S2.h: 'SADEN': redefinition
+*** ERROR C231 IN LINE 201 OF ..\SYSTEM\STC15F2K60S2.h: 'ADC_CONTR': redefinition
+*** ERROR C231 IN LINE 202 OF ..\SYSTEM\STC15F2K60S2.h: 'ADC_RES': redefinition
+*** ERROR C231 IN LINE 203 OF ..\SYSTEM\STC15F2K60S2.h: 'ADC_RESL': redefinition
+*** ERROR C231 IN LINE 206 OF ..\SYSTEM\STC15F2K60S2.h: 'SPSTAT': redefinition
+*** ERROR C231 IN LINE 207 OF ..\SYSTEM\STC15F2K60S2.h: 'SPCTL': redefinition
+*** ERROR C231 IN LINE 208 OF ..\SYSTEM\STC15F2K60S2.h: 'SPDAT': redefinition
+C51 COMPILER V9.55   STC8EEPROM                                                            10/16/2019 15:57:43 PAGE 4   
+
+*** ERROR C231 IN LINE 211 OF ..\SYSTEM\STC15F2K60S2.h: 'IAP_DATA': redefinition
+*** ERROR C231 IN LINE 212 OF ..\SYSTEM\STC15F2K60S2.h: 'IAP_ADDRH': redefinition
+*** ERROR C231 IN LINE 213 OF ..\SYSTEM\STC15F2K60S2.h: 'IAP_ADDRL': redefinition
+*** ERROR C231 IN LINE 214 OF ..\SYSTEM\STC15F2K60S2.h: 'IAP_CMD': redefinition
+*** ERROR C231 IN LINE 215 OF ..\SYSTEM\STC15F2K60S2.h: 'IAP_TRIG': redefinition
+*** ERROR C231 IN LINE 216 OF ..\SYSTEM\STC15F2K60S2.h: 'IAP_CONTR': redefinition
+*** ERROR C231 IN LINE 219 OF ..\SYSTEM\STC15F2K60S2.h: 'CCON': redefinition
+*** ERROR C231 IN LINE 220 OF ..\SYSTEM\STC15F2K60S2.h: 'CF': redefinition
+*** ERROR C231 IN LINE 221 OF ..\SYSTEM\STC15F2K60S2.h: 'CR': redefinition
+*** ERROR C231 IN LINE 222 OF ..\SYSTEM\STC15F2K60S2.h: 'CCF2': redefinition
+*** ERROR C231 IN LINE 223 OF ..\SYSTEM\STC15F2K60S2.h: 'CCF1': redefinition
+*** ERROR C231 IN LINE 224 OF ..\SYSTEM\STC15F2K60S2.h: 'CCF0': redefinition
+*** ERROR C231 IN LINE 225 OF ..\SYSTEM\STC15F2K60S2.h: 'CMOD': redefinition
+*** ERROR C231 IN LINE 226 OF ..\SYSTEM\STC15F2K60S2.h: 'CL': redefinition
+*** ERROR C231 IN LINE 227 OF ..\SYSTEM\STC15F2K60S2.h: 'CH': redefinition
+*** ERROR C231 IN LINE 228 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAPM0': redefinition
+*** ERROR C231 IN LINE 229 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAPM1': redefinition
+*** ERROR C231 IN LINE 230 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAPM2': redefinition
+*** ERROR C231 IN LINE 231 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAP0L': redefinition
+*** ERROR C231 IN LINE 232 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAP1L': redefinition
+*** ERROR C231 IN LINE 233 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAP2L': redefinition
+*** ERROR C231 IN LINE 234 OF ..\SYSTEM\STC15F2K60S2.h: 'PCA_PWM0': redefinition
+*** ERROR C231 IN LINE 235 OF ..\SYSTEM\STC15F2K60S2.h: 'PCA_PWM1': redefinition
+*** ERROR C231 IN LINE 236 OF ..\SYSTEM\STC15F2K60S2.h: 'PCA_PWM2': redefinition
+*** ERROR C231 IN LINE 237 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAP0H': redefinition
+*** ERROR C231 IN LINE 238 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAP1H': redefinition
+*** ERROR C231 IN LINE 239 OF ..\SYSTEM\STC15F2K60S2.h: 'CCAP2H': redefinition
+*** ERROR C231 IN LINE 242 OF ..\SYSTEM\STC15F2K60S2.h: 'CMPCR1': redefinition
+*** ERROR C231 IN LINE 243 OF ..\SYSTEM\STC15F2K60S2.h: 'CMPCR2': redefinition
+*** ERROR C231 IN LINE 246 OF ..\SYSTEM\STC15F2K60S2.h: 'PWMCFG': redefinition
+*** ERROR C231 IN LINE 247 OF ..\SYSTEM\STC15F2K60S2.h: 'PWMCR': redefinition
+*** ERROR C231 IN LINE 248 OF ..\SYSTEM\STC15F2K60S2.h: 'PWMIF': redefinition
+*** ERROR C231 IN LINE 249 OF ..\SYSTEM\STC15F2K60S2.h: 'PWMFDCR': redefinition
+*** WARNING C317 IN LINE 257 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM2T1'
+*** WARNING C317 IN LINE 258 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM2T1H'
+*** WARNING C317 IN LINE 259 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM2T1L'
+*** WARNING C317 IN LINE 260 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM2T2'
+*** WARNING C317 IN LINE 261 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM2T2H'
+*** WARNING C317 IN LINE 262 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM2T2L'
+*** WARNING C317 IN LINE 263 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM2CR'
+*** WARNING C317 IN LINE 264 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM3T1'
+*** WARNING C317 IN LINE 265 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM3T1H'
+*** WARNING C317 IN LINE 266 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM3T1L'
+*** WARNING C317 IN LINE 267 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM3T2'
+*** WARNING C317 IN LINE 268 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM3T2H'
+*** WARNING C317 IN LINE 269 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM3T2L'
+*** WARNING C317 IN LINE 270 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM3CR'
+*** WARNING C317 IN LINE 271 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM4T1'
+*** WARNING C317 IN LINE 272 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM4T1H'
+*** WARNING C317 IN LINE 273 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM4T1L'
+*** WARNING C317 IN LINE 274 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM4T2'
+*** WARNING C317 IN LINE 275 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM4T2H'
+*** WARNING C317 IN LINE 276 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM4T2L'
+*** WARNING C317 IN LINE 277 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM4CR'
+*** WARNING C317 IN LINE 278 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM5T1'
+*** WARNING C317 IN LINE 279 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM5T1H'
+*** WARNING C317 IN LINE 280 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM5T1L'
+*** WARNING C317 IN LINE 281 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM5T2'
+*** WARNING C317 IN LINE 282 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM5T2H'
+*** WARNING C317 IN LINE 283 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM5T2L'
+*** WARNING C317 IN LINE 284 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM5CR'
+*** WARNING C317 IN LINE 285 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM6T1'
+C51 COMPILER V9.55   STC8EEPROM                                                            10/16/2019 15:57:43 PAGE 5   
+
+*** WARNING C317 IN LINE 286 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM6T1H'
+*** WARNING C317 IN LINE 287 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM6T1L'
+*** WARNING C317 IN LINE 288 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM6T2'
+*** WARNING C317 IN LINE 289 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM6T2H'
+*** WARNING C317 IN LINE 290 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM6T2L'
+*** WARNING C317 IN LINE 291 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM6CR'
+*** WARNING C317 IN LINE 292 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM7T1'
+*** WARNING C317 IN LINE 293 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM7T1H'
+*** WARNING C317 IN LINE 294 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM7T1L'
+*** WARNING C317 IN LINE 295 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM7T2'
+*** WARNING C317 IN LINE 296 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM7T2H'
+*** WARNING C317 IN LINE 297 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM7T2L'
+*** WARNING C317 IN LINE 298 OF ..\SYSTEM\STC15F2K60S2.h: attempt to redefine macro 'PWM7CR'
+   5          #include  "FDC2214.h"
+   6          #define MaxPaperNum 170//Ð£×¼Ê±×î¶à170ÕÅ£¬²âÁ¿Ê±169ÕÅ
+   7          //unsigned int xdata cNumOfBeCalibrated=0;//Ð£×¼µÄ×î´óÕÅÊý
+   8          unsigned char xdata cThePointOfCalibrate[170]//Ð£×¼µã±êÖ¾Î»
+   9            ={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  10          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  11          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  12          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  13          0,0,0,0,0,0,0,0,0,0};
+  14          unsigned long xdata FDC2214ThresholdValue[MaxPaperNum]//¸÷ÊýÁ¿Ö½ÕÅ¶ÔÓ¦µãµÄÖÐµãÖµ×÷ÎªãÐÖµ
+  15          ={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  16          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  17          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  18          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  19          0,0,0,0,0,0,0,0,0,0};
+  20          unsigned long xdata FDC2214CalibrateValue[MaxPaperNum]//ÓÃÓÚ·ÅÐ£×¼µÄÖµ
+  21          ={0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  22          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  23          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  24          0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  25          0,0,0,0,0,0,0,0,0,0};
+  26            
+  27            /*//unsigned long xdata FDC2214CalibrateValue[170]=//ÒÔÏÂÎª²âÊÔÓÃÊý¾Ý
+  28          //  {18082304,0,0,0,0,0,0,0,0,0,22296576,0,0,0,0,0,0,0,0,0,23644672,
+  29          //0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,24941568,0,0,0,0,0,0,0,0,0,0,0,
+  30          //0,0,0,0,0,0,0,0,25485312,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  31          //25798656,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,26001408,0,0,
+  32          //0,0,0,0,0,0,0,26079232,0,0,0,0,26112000,0,0,0,0,26143744,
+  33          //0,0,0,0,0,0,0,0,0,26195968,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+  34          //0,0,0,26286080,0,0,0,0,26309632,0,0,0,0,26327040,0,0,0,
+  35          //0,26344448,0,0,0,26356736};//ÓÃÓÚ·ÅÐ£×¼µÄÖµ
+  36          */
+  37          unsigned long code longValueInROM[170]=  //´æ·ÅÔÚROMÖÐµÄãÐÖµ
+  38          {18164736,18887680,19426304,19871744,20256768,20636672,20975616,21270528,21553152,21801984,
+  39          22028288,22241280,22446080,22627328,22792192,22958080,23097344,23236608,23361536,23486464,
+  40          23588864,23698432,23803904,23884800,23964672,24062976,24129536,24206336,24273920,24342528,
+  41          24400896,24466432,24524800,24577024,24623104,24681472,24723712,24768512,24808448,24859648,
+  42          24893440,24932352,24972288,25003008,25040896,25071616,25106432,25134080,25163776,25189376,
+  43          25218048,25245696,25274368,25300992,25323776,25340928,25362432,25391104,25412608,25432064,
+  44          25455616,25472000,25496576,25512960,25526272,25549824,25565184,25583616,25597952,25614336,
+  45          25628672,25646080,25660416,25672704,25691136,25702400,25718784,25733120,25744384,25756672,
+  46          25768960,25783296,25796608,25809920,25821184,25830400,25839616,25849856,25862144,25874432,
+  47          25884672,25894912,25904128,25914368,25924864,25932800,25940992,25952256,25957376,25968640,
+  48          25977856,25986048,25993216,26000384,26008576,26017792,26024960,26031104,26040320,26046464,
+  49          26053632,26062848,26066944,26074112,26080256,26086648,26091520,26098688,26104832,26114048,
+  50          26120192,26124288,26131456,26136528,26141696,26148864,26153984,26161200,26165596,26169344,
+  51          26174464,26180608,26186752,26191872,26198016,26201088,26206208,26211400,26215424,26221568,
+  52          26228736,26231808,26237952,26241024,26244096,26248192,26254136,26257408,26262528,26265600,
+  53          26269720,26272768,26277888,26282708,26285056,26288076,26292320,26295696,26298368,26302464,
+C51 COMPILER V9.55   STC8EEPROM                                                            10/16/2019 15:57:43 PAGE 6   
+
+  54          26305584,26310864,26314752,26317824,26319872,26324168,26330112,26333184,26336256,26342400};//²ÉÑùºó£¬¸Ä³ÉÐ
+             -£×¼ÓÃµÄÊý¾Ý
+  55          
+  56          
+  57          void IapIdle()
+  58          {
+  59   1          IAP_CONTR = 0;                              //¹Ø±ÕIAP¹¦ÄÜ
+  60   1          IAP_CMD = 0;                                //Çå³ýÃüÁî¼Ä´æÆ÷
+  61   1          IAP_TRIG = 0;                               //Çå³ý´¥·¢¼Ä´æÆ÷
+  62   1          IAP_ADDRH = 0x80;                           //½«µØÖ·ÉèÖÃµ½·ÇIAPÇøÓò
+  63   1          IAP_ADDRL = 0;
+  64   1      }
+  65          
+  66          unsigned char IapRead(unsigned int addr)
+  67          {
+  68   1          char dat;
+  69   1      
+  70   1          IAP_CONTR = WT_24M;                         //Ê¹ÄÜIAP
+  71   1          IAP_CMD = 1;                                //ÉèÖÃIAP¶ÁÃüÁî
+  72   1          IAP_ADDRL = addr;                           //ÉèÖÃIAPµÍµØÖ·
+  73   1          IAP_ADDRH = addr >> 8;                      //ÉèÖÃIAP¸ßµØÖ·
+  74   1          IAP_TRIG = 0x5a;                            //Ð´´¥·¢ÃüÁî(0x5a)
+  75   1          IAP_TRIG = 0xa5;                            //Ð´´¥·¢ÃüÁî(0xa5)
+  76   1          _nop_();
+  77   1          dat = IAP_DATA;                             //¶ÁIAPÊý¾Ý
+  78   1          IapIdle();                                  //¹Ø±ÕIAP¹¦ÄÜ
+  79   1      
+  80   1          return dat;
+  81   1      }
+  82          
+  83          void IapProgram(unsigned int addr, unsigned char dat)
+  84          {
+  85   1          IAP_CONTR = WT_24M;                         //Ê¹ÄÜIAP
+  86   1          IAP_CMD = 2;                                //ÉèÖÃIAPÐ´ÃüÁî
+  87   1          IAP_ADDRL = addr;                           //ÉèÖÃIAPµÍµØÖ·
+  88   1          IAP_ADDRH = addr >> 8;                      //ÉèÖÃIAP¸ßµØÖ·
+  89   1          IAP_DATA = dat;                             //Ð´IAPÊý¾Ý
+  90   1          IAP_TRIG = 0x5a;                            //Ð´´¥·¢ÃüÁî(0x5a)
+  91   1          IAP_TRIG = 0xa5;                            //Ð´´¥·¢ÃüÁî(0xa5)
+  92   1          _nop_();
+  93   1          IapIdle();                                  //¹Ø±ÕIAP¹¦ÄÜ
+  94   1      }
+  95          
+  96          void IapErase(unsigned int addr)
+  97          {
+  98   1          IAP_CONTR = WT_24M;                         //Ê¹ÄÜIAP
+  99   1          IAP_CMD = 3;                                //ÉèÖÃIAP²Á³ýÃüÁî
+ 100   1          IAP_ADDRL = addr;                           //ÉèÖÃIAPµÍµØÖ·
+ 101   1          IAP_ADDRH = addr >> 8;                      //ÉèÖÃIAP¸ßµØÖ·
+ 102   1          IAP_TRIG = 0x5a;                            //Ð´´¥·¢ÃüÁî(0x5a)
+ 103   1          IAP_TRIG = 0xa5;                            //Ð´´¥·¢ÃüÁî(0xa5)
+ 104   1          _nop_();                                    //
+ 105   1          IapIdle();                                  //¹Ø±ÕIAP¹¦ÄÜ
+ 106   1      }
+ 107          
+ 108          
+ 109          //longValueInROMÖÐ´æ·Å³ö³§Ð£×¼µã£¬
+ 110          //µÚÒ»´Î³õÊ¼»¯Ê±£¬´ÓlongValueInROM¸´ÖÆµ½EEPROMÖÐ£¨´æ¸ß24Î»£©,²¢Ëã³öãÐÖµ£¬´æÈëFDC2214ThresholdValue
+ 111          //·ÇµÚÒ»´Î³õÊ¼»¯Ê±£¬EEPROMÖÐµÄÐ£×¼µã£¬Ëã³öãÐÖµ£¬´æÈëFDC2214ThresholdValue
+ 112          void EEPROMInit(void)   //½«Ð£×¼Êý¾Ý´ÓEEPROMÖÐµ÷Èëµ½XDATAÄÚ´æÖÐ
+ 113          {
+ 114   1        unsigned char xdata i=0,cTemp=0;
+C51 COMPILER V9.55   STC8EEPROM                                                            10/16/2019 15:57:43 PAGE 7   
+
+ 115   1        unsigned char xdata cTemp0=0,cTemp1=0,cTemp2=0;
+ 116   1        unsigned long xdata longTemp0=0,longTemp1=0,longTemp2=0,longTemp3;//  
+ 117   1        //ÒÔµÚ1ÉÈÇø×îºóÒ»¸ö×Ö½Ú×÷Îª±êÖ¾Î»
+ 118   1        if(IapRead(0x1FF)!=1)//ÏÂÔØ³ÌÐòºó£¬µÚÒ»´ÎÔËÐÐ³ÌÐòÊ±£¬0x1FFµØÖ·EEPROMµÄÖµ¿Ï¶¨²»ÊÇ1£¬Õý³£Ó¦¸ÃÊÇ0xFF£¨ÏÂÔØ³Ì
+             -Ðò»á²Á³ý²»ÓÃµÄROMÇøÓò£©
+ 119   1        {
+ 120   2          IapErase(0);//²Á³ýµÚ1ÉÈÇø
+ 121   2      //    IapErase(0x200);//²Á³ýµÚ2ÉÈÇø
+ 122   2          for(i=0;i<170;i++)//µÚÒ»´ÎÔËÐÐ³ÌÐò£¬½«³ö³§´æ´¢ÓÚEEPROMÖÐµÚ1¸öÉÈÇø£¬170¸öÊý¾Ý£¬Ã¿¸ö3×Ö½Ú£¬Ò»¹²510¸ö×Ö½Ú£¬
+             -Õ¼µÚÒ»¸öÉÈÇø
+ 123   2          {
+ 124   3        
+ 125   3      
+ 126   3            cTemp0=(longValueInROM[i]>>20);//È¡¸ß24Î»
+ 127   3            cTemp1=(longValueInROM[i]>>12);
+ 128   3            cTemp2=(longValueInROM[i]>>4);
+ 129   3      
+ 130   3            
+ 131   3            IapProgram(0+i*3, cTemp0);//Ð´ÈëµÚÒ»ÉÈÇø
+ 132   3            IapProgram(1+i*3, cTemp1);
+ 133   3            IapProgram(2+i*3, cTemp2);
+ 134   3          }
+ 135   2          for(i=1;i<170;i++)//µÚÒ»´ÎÔËÐÐ³ÌÐò£¬Ëã³öãÐÖµ£¬´æÈëFDC2214ThresholdValue 
+ 136   2            FDC2214ThresholdValue[i-1]=(longValueInROM[i-1]+longValueInROM[i])/2;//Ö»ÓÐÇ°169¸öãÐÖµÊý¾ÝÓÐÐ§    
+ 137   2      
+ 138   2            IapProgram(0x1FF, 1);//¸Ä±ä±êÖ¾Î»
+ 139   2        
+ 140   2        }
+ 141   1        else//²»ÊÇµÚÒ»´ÎÔËÐÐ£¬Ôò¸ù¾ÝµÚÒ»¸öÉÈÇøµÄÐ£×¼Öµ¼ÆËããÐÖµ´æµ½FDC2214ThresholdValue[i]
+ 142   1        {
+ 143   2          longTemp1=IapRead(0);
+ 144   2          longTemp2=IapRead(1);
+ 145   2          longTemp3=IapRead(2);//¶ÁÈ¡µÚ0×é³ö³§Ð£×¼Öµ
+ 146   2          longTemp0=((((longTemp1<<8)+longTemp2)<<8)+longTemp3)<<4; 
+ 147   2            
+ 148   2          
+ 149   2          for(i=1;i<170;i++)
+ 150   2          {//½«µ±Ç°¶Á³öµÄÖµÓëÉÏÒ»Öµµ½ÖÐµã×÷ÎªÅÐ¶ÏãÐÖµ
+ 151   3            longTemp1=IapRead(0+i*3);
+ 152   3            longTemp2=IapRead(1+i*3) ;
+ 153   3            longTemp3=IapRead(2+i*3);//¶ÁÈ¡ºóÒ»×é³ö³§Ð£×¼Öµ
+ 154   3            longTemp1=((((longTemp1<<8)+longTemp2)<<8)+longTemp3)<<4;   
+ 155   3            
+ 156   3            FDC2214ThresholdValue[i-1]=(longTemp0+longTemp1)/2;//Ö»ÓÐÇ°169¸öÊý¾ÝÓÐÐ§  
+ 157   3            longTemp0=longTemp1;
+ 158   3          }
+ 159   2        } 
+ 160   1      }
+ 161              
+ 162              
+ 163          
+ 164          //¸ù¾ÝÒÑÐ£×¼µÄµã¾ÝFDC2214CalibrateValue[]ÖÐ²»Îª0µÄµã£¨EEPROMInit()ÖÐFDC2214CalibrateValue[]ÒÑ³õÊ¼»¯Îª0£©£¬
+ 165          //¼°Ô­Ê¼³ö³§Êý¾Ý£¬ÄâºÏ³öËùÓÐÐÂµÄÐ£×¼µã£¬´æÈëEEPROM£¬²¢Ëã³öÐÂµÄãÐÖµ£¬´æÈëFDC2214ThresholdValue
+ 166          void EEPROMSave(void)   //½«Ð£×¼Êý¾Ý´ÓXDATAÄÚ´æ±£´æÖÁEEPROMÖÐ
+ 167          {//¸ù¾ÝÒÑÐ£×¼µÄµã£¨¿ÉÄÜÃ»ÓÐ170¸ö£©£¬¼°Ô­Ê¼³ö³§Êý¾Ý£¬ÄâºÏ³öËùÓÐÐÂµÄÐ£×¼µã£¬´æÈëEEPROM£¬²¢Ëã³öÐÂµÄãÐÖµ£¬´æÈë
+             -FDC2214ThresholdValue
+ 168   1        unsigned char xdata i=0,j=0,cTemp0=0,cTemp1=0,cTemp2=0;
+ 169   1        float xdata fTemp1=0,fTemp2=0;
+ 170   1        unsigned long xdata longTemp0=0,longTemp1=0,longTemp2=0,longTemp3=0;
+ 171   1        cTemp1=0;
+ 172   1        for(i=1;i<170;i++)//Ð£×¼Ê±£¬ÖÁÉÙ²â1ÕÅ(¼´i=0)ºÍÁíÒ»¸öÊýÁ¿
+ 173   1        {
+C51 COMPILER V9.55   STC8EEPROM                                                            10/16/2019 15:57:43 PAGE 8   
+
+ 174   2          if(FDC2214CalibrateValue[i]!=0)
+ 175   2          {//ÕÒ³ö·Ç0µÄÐ£×¼µã£¬¸ù¾Ý´ËÐ£×¼µãºÍÉÏÒ»µãÐ£×¼µãÊýÖµ,¼°ÒÑÓÐµÄ²âÁ¿ÇúÏß£¬ÍÆËã³öÖÐ¼äÇøÓò¸÷µãÊýÖµ
+ 176   3            cTemp2=i;
+ 177   3            for(j=cTemp1+1;j<cTemp2;j++)
+ 178   3            {//INT(($B2-$B$1)*(H$21-H$1)/($B$21-$B$1)+H$1)
+ 179   4              fTemp1=(float)(FDC2214CalibrateValue[cTemp2]-FDC2214CalibrateValue[cTemp1]);
+*** ERROR C215 IN LINE 179 OF ..\SYSTEM\STC8EEPROM.c: illegal type conversion
+ 180   4              fTemp2=(float)(longValueInROM[cTemp2]-longValueInROM[cTemp1]);
+*** ERROR C215 IN LINE 180 OF ..\SYSTEM\STC8EEPROM.c: illegal type conversion
+ 181   4              fTemp1=fTemp1/fTemp2;
+ 182   4              fTemp2=(float)  (longValueInROM[j]-longValueInROM[cTemp1]);
+*** ERROR C215 IN LINE 182 OF ..\SYSTEM\STC8EEPROM.c: illegal type conversion
+ 183   4              fTemp1=fTemp1*fTemp2;
+ 184   4              FDC2214CalibrateValue[j]= (unsigned long)fTemp1+FDC2214CalibrateValue[cTemp1];//
+ 185   4              
+ 186   4            }
+ 187   3            cTemp1=cTemp2;//ÏòºóµÝ½ø
+ 188   3          }
+ 189   2        
+ 190   2        } 
+ 191   1          
+ 192   1          
+ 193   1        IapErase(0);//²Á³ýµÚ1ÉÈÇø
+ 194   1        for(i=0;i<170;i++)//½«Ð£×¼Êý¾Ý´æ´¢ÓÚEEPROMÖÐµÚ1¸öÉÈÇø£¬170¸öÊý¾Ý£¬Ã¿¸ö3×Ö½Ú£¬Ò»¹²510¸ö×Ö½Ú£¬Õ¼µÚÒ»¸öÉÈÇø
+ 195   1        {
+ 196   2          
+ 197   2            cTemp0=(FDC2214CalibrateValue[i]>>20);//È¡¸ß24Î»
+ 198   2            cTemp1=(FDC2214CalibrateValue[i]>>12);
+ 199   2            cTemp2=(FDC2214CalibrateValue[i]>>4);
+ 200   2      
+ 201   2            
+ 202   2            IapProgram(0+i*3, cTemp0);//Ð´ÈëµÚÒ»ÉÈÇø
+ 203   2            IapProgram(1+i*3, cTemp1);
+ 204   2            IapProgram(2+i*3, cTemp2);    
+ 205   2      
+ 206   2        }
+ 207   1        IapProgram(0x1FF,1);//¸Ä±ä±êÖ¾Î»£¬ÖØÐÂÆô¶¯Ê±²»¸²¸ÇÐ£×¼Êý¾Ý  
+ 208   1      
+ 209   1        
+ 210   1        
+ 211   1        for(i=1;i<170;i++)//Ëã³öãÐÖµ£¬´æÈëFDC2214ThresholdValue 
+ 212   1          FDC2214ThresholdValue[i-1]=(FDC2214CalibrateValue[i-1]+FDC2214CalibrateValue[i])/2;//Ö»ÓÐÇ°169¸öãÐÖµÊý¾Ý
+             -ÓÐÐ§    
+ 213   1      
+ 214   1        //´¦ÀíÍêºó£¬¸ù¾Ý±êÖ¾Î»£¬½«ÏßÐÔÄâºÏ³öµÄÐ£×¼Êý¾ÝµãÇåÁã£¬±£ÁôÔ­Ê¼Êý¾Ýµã
+ 215   1        for(i=0;i<170;i++)
+ 216   1        {
+ 217   2          if((cThePointOfCalibrate[i])==0)FDC2214CalibrateValue[i]=0;
+ 218   2        }   
+ 219   1      
+ 220   1      }
+ 221          
+ 222          void EEPROMReset(void)    //»Ö¸´³ö³§EEPROMÊý¾Ý
+ 223          {
+ 224   1          IapErase(0x0);    
+ 225   1          IapErase(0x200);  
+ 226   1          IAP_CONTR=0xA8;//²úÉúÈí¼þ¸´Î»
+ 227   1      }
+
+C51 COMPILATION COMPLETE.  42 WARNING(S),  210 ERROR(S)

@@ -1,0 +1,393 @@
+C51 COMPILER V9.55   MYSELF                                                                10/16/2019 15:57:43 PAGE 1   
+
+
+C51 COMPILER V9.55, COMPILATION OF MODULE MYSELF
+OBJECT MODULE PLACED IN .\Objects\myself.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE myself.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\SYSTEM;..\HARDWARE;..\USER) 
+                    -DEBUG OBJECTEXTEND PRINT(.\Listings\myself.lst) TABS(2) OBJECT(.\Objects\myself.obj)
+
+line level    source
+
+   1          #include  "config.h"
+   2          #include  "intrins.h"
+   3          #include  "Serial.h"//串口1(P3.0/RxD, P3.1/TxD)
+   4          #include <myself.h>
+*** WARNING C318 IN LINE 4 OF ..\USER\myself.h: can't open file 'ADC.h'
+   5          #include  "STC8EEPROM.h"
+   6          #include  "string.h"
+   7          
+   8          bit bFlagTimer0=0,bFlag2ms=0,bFlag3s=0;
+   9          bit TestKeyLastTime=1;
+  10          unsigned char xdata cJudgeKey=0;//用于判断按键的变量
+  11          unsigned char xdata T0Counter2ms=0;
+  12          unsigned int xdata T0Counter3s=0;//3s计数器
+  13          
+  14          unsigned char xdata KeyNum[3]={0,0,0};//存放连续3次判断的键值
+  15          unsigned char code KeyThreshold[7]={0x38,0x8D,0xBA,0xD6,0xE9,0xF8,0xFF};
+  16          //  键名        电压值    测量AD值      键值区间     阈值
+  17          //0 KeyStartStop 0        0x00      0x00-0x38   0x38    
+  18          //1 KeyDown     1/2Vcc    0x71      0x39-0x8D   0x8D  
+  19          //2 KeyMiddle   2/3Vcc    0xA9      0x8E-0xBA   0xBA
+  20          //3 KeyRight    3/4Vcc    0xCB      0xBB-0xD6   0xD6
+  21          //4 KeyLeft     4/5Vcc    0xE1      0xD7-0xE9   0xE9
+  22          //5 KeyUp       5/6Vcc    0xF1      0xEA-0xF8   0xF8
+  23          //6 NoneKey       Vcc     0xFF      0xF8-0xFF   0xFF
+  24          
+  25          
+  26          
+  27          
+  28          
+  29          
+  30          void DelayNms110592M(int n)//延时Nms//@@11.0592MHz
+  31          {
+  32   1        unsigned int i;
+  33   1        for(i=0;i<n;i++)
+  34   1          Delay1ms110592M();
+  35   1      }
+  36          void DelayNms24MHz(int n)//延时Nms//@24MHz
+  37          {
+  38   1        unsigned int i;
+  39   1        for(i=0;i<n;i++)
+  40   1          Delay1ms24MHz();
+  41   1      }
+  42          
+  43          
+  44          void Delay1ms110592M()    //@11.0592MHz
+  45          {
+  46   1        unsigned char i, j;
+  47   1      
+  48   1        i = 15;
+  49   1        j = 90;
+  50   1        do
+  51   1        {
+  52   2          while (--j);
+  53   2        } while (--i);
+C51 COMPILER V9.55   MYSELF                                                                10/16/2019 15:57:43 PAGE 2   
+
+  54   1      }
+  55          
+  56          void Delay1ms24MHz()    //@24.000MHz
+  57          {
+  58   1        unsigned char i, j;
+  59   1      
+  60   1        _nop_();
+  61   1        i = 32;
+  62   1        j = 40;
+  63   1        do
+  64   1        {
+  65   2          while (--j);
+  66   2        } while (--i);
+  67   1      }
+  68          
+  69            
+  70          
+  71          void Timer0Init(void)   //1毫秒@24.000MHz
+  72          {
+  73   1      
+  74   1        AUXR |= 0x80;   //定时器时钟1T模式
+  75   1        TMOD &= 0xF0;   //设置定时器模式
+  76   1        TL0 = 0x40;   //设置定时初值
+  77   1        TH0 = 0xA2;   //设置定时初值
+  78   1        TF0 = 0;    //清除TF0标志
+  79   1        TR0 = 1;    //定时器0开始计时
+  80   1        ET0 = 1;  //使能定时器0中断 
+  81   1      }
+  82          
+  83          void Timer0Interrupt() interrupt 1 using 2 //定时器0的中断
+  84          {
+  85   1       unsigned char xdata i=0;
+  86   1        ADC_CONTR |= ADC_START;                          //启动ADC转换  
+*** ERROR C202 IN LINE 86 OF myself.c: 'ADC_START': undefined identifier
+  87   1        
+  88   1        T0Counter2ms++;
+  89   1      
+  90   1        if(T0Counter2ms>=2)
+  91   1        {
+  92   2          bFlag2ms=1;
+  93   2          T0Counter2ms=0;
+  94   2        }
+  95   1        if(bFlag3s==1) T0Counter3s++;
+  96   1        
+  97   1      }
+  98          
+  99          
+ 100          //单个按键识别，本程序未用到
+ 101          //按键读下连续读8次（间隔2ms）,如全为按下cJudgeKey==0x00，记录到TestKeyLastTime中
+ 102          //在下一个连续读8次，如全为抬起cJudgeKey==0xFF，且前一状态为按下，
+ 103          //确认此时为按键有效按下，且有效抬起，进行相应的操作
+ 104          bit KeyPress(bit KeyIO)
+ 105          {
+ 106   1        cJudgeKey=(cJudgeKey<<1) | KeyIO; // 判断值左移一位 ，并将当前扫描值入最低
+ 107   1        if(cJudgeKey==0x00)//按键按下，状态稳定。KeyIO按下为0，抬起为1
+ 108   1        {
+ 109   2          TestKeyLastTime=KeyIO;//记录状态
+ 110   2        }
+ 111   1        else if((cJudgeKey==0xFF) && (TestKeyLastTime!=KeyIO))//按键从按下到抬起，稳定
+ 112   1        {
+ 113   2          TestKeyLastTime=KeyIO;
+ 114   2          
+C51 COMPILER V9.55   MYSELF                                                                10/16/2019 15:57:43 PAGE 3   
+
+ 115   2          return 1;
+ 116   2        }     
+ 117   1        else 
+ 118   1        {
+ 119   2      
+ 120   2        }
+ 121   1        return 0;
+ 122   1      }
+ 123          
+ 124          
+ 125          
+ 126          unsigned char JudgeKeyNum(unsigned char ADCValue)//根据ADC值判断5向按键键值
+ 127          {
+ 128   1      
+ 129   1        static unsigned char xdata cFlag5D=0;//保存连接读入的键值
+ 130   1        static unsigned char xdata c5DkeyLastTime=0;//保存上次按键值
+ 131   1      //  static unsigned char xdata cNumLastTime=6;//记录上次确认的键值  
+ 132   1        static unsigned char xdata cKeyPressNum;
+ 133   1        unsigned char c5DkeyNow=7;
+ 134   1      
+ 135   1        
+ 136   1      //  unsigned char c5DkeyNow=7;
+ 137   1      //  unsigned char i=0;
+ 138   1      //  //判断当前读入ADC对应的按键值
+ 139   1      
+ 140   1      //  思路与单个按键相似
+ 141   1        //根据AD值得到当前键值
+ 142   1        if(ADCValue<=KeyThreshold[0]) c5DkeyNow=0;
+ 143   1        else if (ADCValue>KeyThreshold[0] && ADCValue<=KeyThreshold[1]) c5DkeyNow=1;
+ 144   1        else if (ADCValue>KeyThreshold[1] && ADCValue<=KeyThreshold[2]) c5DkeyNow=2;
+ 145   1        else if (ADCValue>KeyThreshold[2] && ADCValue<=KeyThreshold[3]) c5DkeyNow=3;
+ 146   1        else if (ADCValue>KeyThreshold[3] && ADCValue<=KeyThreshold[4]) c5DkeyNow=4;
+ 147   1        else if (ADCValue>KeyThreshold[4] && ADCValue<=KeyThreshold[5]) c5DkeyNow=5;
+ 148   1        else  c5DkeyNow=6;
+ 149   1      
+ 150   1        //记录按键
+ 151   1        if(c5DkeyNow==6)//抬起，记录一次
+ 152   1          cFlag5D=(cFlag5D<<1)&0;//左移记录1次
+ 153   1        else if(c5DkeyNow==c5DkeyLastTime)//AD判断的键值与上次相同，
+ 154   1          cFlag5D=(cFlag5D<<1)|1;//左移记录1次
+ 155   1        else //特殊情况，本次非抬起，也与上次不同，基本不可能出现
+ 156   1          cFlag5D=(cFlag5D<<1)& 0;//左移记录1次
+ 157   1        
+ 158   1        c5DkeyLastTime=c5DkeyNow;//记录当前AD读的键值 
+ 159   1        
+ 160   1        //判断键值
+ 161   1        if(cFlag5D==0xFF)//连续8次读入一样
+ 162   1          cKeyPressNum=c5DkeyNow; //记录当前键值
+ 163   1        
+ 164   1        if(cFlag5D==0x00 && cKeyPressNum !=6 )//按键有效抬起，且前一次为有效按键
+ 165   1        {
+ 166   2          c5DkeyNow=cKeyPressNum; 
+ 167   2          cKeyPressNum=0x06;
+ 168   2          return c5DkeyNow;
+ 169   2        }
+ 170   1        else
+ 171   1          return 0x06;  
+ 172   1      
+ 173   1      }
+ 174          
+ 175          unsigned char* Hex2ASCII(unsigned long long28Value)//8位值转化为ASCII
+ 176          {
+C51 COMPILER V9.55   MYSELF                                                                10/16/2019 15:57:43 PAGE 4   
+
+ 177   1        unsigned char xdata cindexTempHex[8]={0,0,0,0,0,0,0,0};
+ 178   1        char xdata i=0;
+ 179   1        
+ 180   1        for(i=7;i>=0;i=i-2)//高位在前
+ 181   1        {
+ 182   2          cindexTempHex[i]=long28Value;//利用默认数据类型转换，char为8位，取出lont int 的低8位
+ 183   2          cindexTempHex[i-1]=cindexTempHex[i]>>4;//取出8位中高4位 
+ 184   2          cindexTempHex[i]=cindexTempHex[i]-(cindexTempHex[i-1]<<4);//取出8位中的低4位
+ 185   2          long28Value=long28Value>>8;//低8位处理完毕，右移      
+ 186   2        }
+ 187   1      //  S1SendData(0xAA);   
+ 188   1        for(i=0;i<=7;i++)
+ 189   1        {
+ 190   2      
+ 191   2      //    S1SendData(cindexTempHex[i]);   
+ 192   2          if(cindexTempHex[i]<=9) cindexTempHex[i]+=0x30;//小于9转成ASCII
+ 193   2          else cindexTempHex[i]=cindexTempHex[i]+55;//大于9的数转成ASCII    
+ 194   2      //    S1SendData(cindexTempHex[i]);     
+ 195   2        }
+ 196   1        cindexTempHex[8]=0;//数组后加一个结束符
+ 197   1      //  S1SendString(cindexTempHex);//
+ 198   1      //  S1SendData(13);
+ 199   1      //  S1SendData(10); 
+ 200   1        return cindexTempHex;
+ 201   1        
+ 202   1      }
+ 203          
+ 204          unsigned char* Hex2ASCII3Figure(unsigned int cNum)//3位十进制值转化为ASCII
+ 205          {
+ 206   1        //unsigned char xdata * cindexTempHex=0;//此句有错（语法上没有问题）
+ 207   1        unsigned char xdata cindexTempHex[3]={0,0,0};
+ 208   1        char xdata i=0;
+ 209   1        
+ 210   1        cindexTempHex[0]=cNum /100;//利用数据类型自动转换为整型
+ 211   1        cindexTempHex[1]=(cNum  - cindexTempHex[0] * 100) /10;  
+ 212   1        cindexTempHex[2]= cNum % 10;
+ 213   1        for(i=0;i<=3;i++) cindexTempHex[i]+= 0x30;//转成ASCII
+ 214   1        
+ 215   1      
+ 216   1        cindexTempHex[3]=0;//数组后加一个结束符
+ 217   1      //  S1SendString(cindexTempHex);//
+ 218   1      //  S1SendData(13);
+ 219   1      //  S1SendData(10); 
+ 220   1        return cindexTempHex;
+ 221   1        
+ 222   1      }
+ 223          
+ 224          //根据读入的FDC2214值，和FDC2214ThresholdValue[170]值，判断纸张张数
+ 225          unsigned int JudgePaperNum(unsigned long longFDC2214Value)
+ 226          {
+ 227   1        extern unsigned long xdata FDC2214ThresholdValue[170];//各数量纸张对应点的中点值作为阈值
+ 228   1        unsigned char cPaperNum=0,i=0;
+ 229   1        if(longFDC2214Value < FDC2214ThresholdValue[0])
+ 230   1          return(1);
+ 231   1        else
+ 232   1          for(i=1;i<169;i++)
+ 233   1          {
+ 234   2            if((longFDC2214Value >= FDC2214ThresholdValue[i-1]) && (longFDC2214Value < FDC2214ThresholdValue[i]) )
+ 235   2              return(i+1);//随着纸张增加，传感器值增加，"<"
+ 236   2          } 
+ 237   1        return(999);//显示999表示超出范围了
+ 238   1        
+C51 COMPILER V9.55   MYSELF                                                                10/16/2019 15:57:43 PAGE 5   
+
+ 239   1        
+ 240   1      }
+ 241          
+ 242          //unsigned char* Num2Speaker(unsigned int cNum)//将测量出的数据转换成发送的串口的音频字符串
+ 243          //{
+ 244          //  unsigned char xdata ctemp100=0,ctemp10=0,ctemp1=0;
+ 245          //  unsigned char * str1="B7:0";
+ 246          //  unsigned char * pt=str1;
+ 247          //  unsigned char * str2='\0';
+ 248          //  
+ 249          //    str1=str1+4;//B
+ 250          ////    * str1=0x37;str1++;//7
+ 251          ////    * str1=0x3A;str1++;//:
+ 252          ////    * str1=0x30;str1++;//0
+ 253          ////    * str1='\0';  
+ 254          
+ 255          //  if(cNum<10) 
+ 256          //  {
+ 257          //    *str1=((unsigned char)cNum+0x30);str1++;
+ 258          //    *str1='1';str1++;//张
+ 259          //    *str1='2';str1++;
+ 260          //    *str1='\0';
+ 261          //    S1SendString(str1); 
+ 262          //    return(pt);
+ 263          //    
+ 264          //  }
+ 265          //  else if(cNum<100)
+ 266          //  {
+ 267          //    ctemp10=cNum/10;
+ 268          //    ctemp1=cNum%10;
+ 269          //    *str1=(ctemp10+0x30);str1++;
+ 270          //    *str1=0x31;str1++;*str1=0x30;str1++;//十
+ 271          //    
+ 272          //  
+ 273          //    if(ctemp1 !=0)
+ 274          //    {   
+ 275          //      *str1=0x30;str1++;//0 
+ 276          //      *str1=ctemp1+0x30;str1++;
+ 277          //    }
+ 278          //    *str1='1';str1++;//张
+ 279          //    *str1='2';str1++;
+ 280          //    *str1='\0';
+ 281          //    return(pt);
+ 282          //  } 
+ 283          //  else if(cNum<=169)
+ 284          //  {
+ 285          //    ctemp100=cNum/100;  
+ 286          //    ctemp1=cNum % 10;
+ 287          //    ctemp10=(cNum-100)/10;  
+ 288          //    
+ 289          ////    S1SendData(cNum);   
+ 290          ////    S1SendData(ctemp100);
+ 291          ////    S1SendData(ctemp10);  
+ 292          ////    S1SendData(ctemp1);     
+ 293          ////    S1SendData(0xAA);     
+ 294          //    *str1=(ctemp100+0x30);str1++;
+ 295          //    *str1=0x31;str1++;*str1=0x31;str1++;//百
+ 296          //    
+ 297          //    if(ctemp10 !=0)
+ 298          //    {   
+ 299          //      *str1=0x30;str1++;*str1=ctemp10+0x30;str1++;//
+ 300          //      
+C51 COMPILER V9.55   MYSELF                                                                10/16/2019 15:57:43 PAGE 6   
+
+ 301          //      *str1=0x31;str1++;*str1=0x30;str1++;//十
+ 302          //    }
+ 303          //    else
+ 304          //    {
+ 305          //      *str1=0x31;str1++;*str1=0x33;str1++;//零
+ 306          //    }
+ 307          //    *str1=0x30;str1++;*str1=ctemp1+0x30;str1++;//
+ 308          //    
+ 309          //    *str1='1';str1++;//张
+ 310          //    *str1='2';str1++;
+ 311          //    *str1='\0';
+ 312          //    return(pt);   
+ 313          //  }   
+ 314          //  else 
+ 315          //    return("A7:00021");
+ 316          //  
+ 317          //}
+ 318          
+ 319          unsigned char* Num2Speaker(unsigned int cNum)//将测量出的数据转换成发送的串口的音频字符串
+ 320          {
+ 321   1        unsigned char xdata ctemp100=0,ctemp10=0,ctemp1=0;
+ 322   1        unsigned char xdata str1[18]="B7:";
+ 323   1        unsigned char xdata i=3;
+ 324   1        unsigned char * pt=str1;
+ 325   1        unsigned char * str2='\0';
+ 326   1        
+ 327   1      //    str1=str1+4;//B
+ 328   1      //    * str1=0x37;str1++;//7
+ 329   1      //    * str1=0x3A;str1++;//:
+ 330   1      //    * str1=0x30;str1++;//0
+ 331   1      //    * str1='\0';  
+ 332   1        if(cNum>169)  return("A7:00021");//超出测量范围
+ 333   1        else if (cNum==100)  return("B7:011112"); //一百张
+ 334   1        else if (cNum==10)  return("B7:1012");  //十张  
+ 335   1        else
+ 336   1        {
+ 337   2          ctemp100=cNum/100;  
+ 338   2          ctemp10=(cNum/10-10*ctemp100);    
+ 339   2          ctemp1=cNum % 10;   
+ 340   2          if(ctemp100>0) // >100的百位数
+ 341   2          {
+ 342   3            str1[i++]=0x30; str1[i++]=ctemp100+0x30;//百位
+ 343   3            str1[i++]=0x31; str1[i++]=0x31;//百
+ 344   3          }
+ 345   2          if(ctemp100>0 && (ctemp10==0) )// >100，中间为零
+ 346   2          {
+ 347   3            str1[i++]=0x31; str1[i++]=0x33;//零,
+ 348   3          }
+ 349   2          if(ctemp10>1) // 十位，
+ 350   2          {
+ 351   3            str1[i++]=0x30; str1[i++]=ctemp10+0x30;// N
+ 352   3            str1[i++]=0x31; str1[i++]=0x30;// 十
+ 353   3          }
+ 354   2          else if(ctemp10==1)//十几张
+ 355   2          {
+ 356   3            str1[i++]=0x31; str1[i++]=0x30;// 十      
+ 357   3          }
+ 358   2          if(ctemp1>0) // 个位，
+ 359   2          {
+ 360   3            str1[i++]=0x30; str1[i++]=ctemp1+0x30;// N
+ 361   3          }   
+ 362   2          str1[i++]=0x31; str1[i++]=0x32;str1[i]='\0';// 张 
+C51 COMPILER V9.55   MYSELF                                                                10/16/2019 15:57:43 PAGE 7   
+
+ 363   2          return(str1);
+ 364   2        }
+ 365   1      
+ 366   1        
+ 367   1      }
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  1 ERROR(S)

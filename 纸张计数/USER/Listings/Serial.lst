@@ -1,0 +1,154 @@
+C51 COMPILER V9.55   SERIAL                                                                10/28/2019 08:35:36 PAGE 1   
+
+
+C51 COMPILER V9.55, COMPILATION OF MODULE SERIAL
+OBJECT MODULE PLACED IN .\Objects\Serial.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\SYSTEM\Serial.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\SYSTEM;..\HARDWARE
+                    -;..\USER) DEBUG OBJECTEXTEND PRINT(.\Listings\Serial.lst) TABS(2) OBJECT(.\Objects\Serial.obj)
+
+line level    source
+
+   1          #include  "Serial.h"
+   2          
+   3          bit bS1TrBusy=0;//串口1发送忙标志
+   4          bit bS2TrBusy=0;//串口2发送忙标志
+   5          bit bS1Rec=0;//串口1接收到数据标志
+   6          bit bS2Rec=0;//串口2接收到数据标志
+   7          unsigned char xdata cS1Rec=0;//串口1接收到字符
+   8          unsigned char xdata cS2Rec=0;//串口2接收到字符
+   9          
+  10          
+  11          
+  12          
+  13          
+  14          void SerialInit(void)
+  15          { //定时2作为波特率发生器，默认8位数据，
+  16   1       //串口1(P3.0/RxD, P3.1/TxD)，串口2S2_S0=1 (P4.6/RxD2_2, P4.7/TxD2_2)
+  17   1        //中断方式
+  18   1          ACC = P_SW1;
+  19   1          ACC &= ~(S1_S0 | S1_S1);    //S1_S0=0 S1_S1=0
+  20   1          P_SW1 = ACC;                //(P3.0/RxD, P3.1/TxD)
+  21   1          P_SW2 &= ~S2_S0;            //S2_S0=0 (P1.0/RxD2, P1.1/TxD2)
+  22   1          // P_SW2 |= S2_S0;             //S2_S0=1 (P4.6/RxD2_2, P4.7/TxD2_2)
+  23   1      
+  24   1          S2CON = 0x50;               //8位可变波特率
+  25   1      
+  26   1          SCON = 0x50;                //8位可变波特率
+  27   1      
+  28   1          AUXR |= 0x01;   //串口1选择定时器2为波特率发生器  
+  29   1          AUXR |= 0x04;   //定时器2时钟为MAIN_Fosc,即1T
+  30   1        
+  31   1          T2L = (65536 - (MAIN_Fosc/4/BAUD));   //设置波特率重装值
+  32   1          T2H = (65536 - (MAIN_Fosc/4/BAUD))>>8;
+  33   1      
+  34   1      
+  35   1          AUXR |= 0x10;   //启动定时器2
+  36   1          
+  37   1          
+  38   1          IE2 = 0x01;     //使能串口2中断
+  39   1          ES=1;           //使能串口1中断
+  40   1          EA = 1;
+  41   1        
+  42   1      }
+  43          
+  44          
+  45          void Uart1() interrupt 4 using 1
+  46          {
+  47   1      
+  48   1        if(RI)
+  49   1        {
+  50   2          RI=0;       //清除RI位
+  51   2          cS1Rec = SBUF; //将数据读出
+  52   2          bS1Rec=1;//置接收到数据标志位
+  53   2      
+  54   2          
+C51 COMPILER V9.55   SERIAL                                                                10/28/2019 08:35:36 PAGE 2   
+
+  55   2        }
+  56   1        if(TI)
+  57   1        {
+  58   2      //    P55=0;
+  59   2          TI=0;         //清除TI位
+  60   2          bS1TrBusy=0; //清忙标志
+  61   2        }
+  62   1        
+  63   1      
+  64   1      /*----------------------------
+  65   1      UART 中断服务程序
+  66   1      -----------------------------*/ 
+  67   1      }
+  68          void Uart2() interrupt 8 using 1
+  69          {
+  70   1          if (S2CON & S2RI)
+  71   1          {
+  72   2            cS2Rec = S2BUF; //将数据读出
+  73   2            bS2Rec=1;//置接收到数据标志位
+  74   2            S2CON &= ~S2RI;         //清除S2RI位
+  75   2          }
+  76   1          if (S2CON & S2TI)
+  77   1          {
+  78   2              S2CON &= ~S2TI;         //清除S2TI位
+  79   2              bS2TrBusy = 0;               //清忙标志
+  80   2          }
+  81   1      }
+  82          
+  83          /*----------------------------
+  84          发送串口数据
+  85          ----------------------------*/
+  86          void S1SendData(unsigned char dat)
+  87          {
+  88   1          while (bS1TrBusy);//等待前面的数据发送完成
+  89   1          ACC = dat;                  //获取校验位P (PSW.0)
+  90   1      
+  91   1          bS1TrBusy = 1;
+  92   1          SBUF = ACC;                 //写数据到UART数据寄存器
+  93   1      }
+  94          
+  95          /*----------------------------
+  96          发送字符串
+  97          ----------------------------*/
+  98          void S1SendString(unsigned char *s)
+  99          {
+ 100   1          while (*s)                  //检测字符串结束标志
+ 101   1          {
+ 102   2              S1SendData(*s++);         //发送当前字符
+ 103   2          }
+ 104   1      }
+ 105          
+ 106          void S2SendData(unsigned char dat)
+ 107          {
+ 108   1          while (bS2TrBusy);               //等待前面的数据发送完成
+ 109   1          ACC = dat;                  //获取校验位P (PSW.0)
+ 110   1      
+ 111   1          bS2TrBusy = 1;
+ 112   1          S2BUF = ACC;                //写数据到UART2数据寄存器
+ 113   1      }
+ 114          
+ 115          /*----------------------------
+ 116          发送字符串
+C51 COMPILER V9.55   SERIAL                                                                10/28/2019 08:35:36 PAGE 3   
+
+ 117          ----------------------------*/
+ 118          void S2SendString(unsigned char *s)
+ 119          {
+ 120   1          while (*s)                  //检测字符串结束标志
+ 121   1          {
+ 122   2              S2SendData(*s++);         //发送当前字符
+ 123   2          }
+ 124   1      }
+ 125          
+ 126          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    202    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =      2    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      4    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

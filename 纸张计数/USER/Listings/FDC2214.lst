@@ -1,0 +1,373 @@
+C51 COMPILER V9.55   FDC2214                                                               10/28/2019 08:38:13 PAGE 1   
+
+
+C51 COMPILER V9.55, COMPILATION OF MODULE FDC2214
+OBJECT MODULE PLACED IN .\Objects\FDC2214.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE ..\HARDWARE\FDC2214.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\SYSTEM;..\HARDW
+                    -ARE;..\USER) DEBUG OBJECTEXTEND PRINT(.\Listings\FDC2214.lst) TABS(2) OBJECT(.\Objects\FDC2214.obj)
+
+line level    source
+
+   1          #include  "FDC2214.h"
+   2          #include  <STC15F2K60S2.h>
+   3          #include  "Serial.h"
+   4          #include  "intrins.h"
+   5          #include <myself.h>
+   6          sbit FDC2214SCL=P0^6;
+   7          sbit FDC2214SDA=P0^7;
+   8          unsigned long longFDC2214Data;
+   9          #define nop _nop_();
+  10          
+  11          // ------------------------------------------------------------
+  12          // IO¿ÚÄ£ÄâI2CÍ¨ÐÅ
+  13          // ------------------------------------------------------------
+  14          
+  15          
+  16          /*****************ÒÔÏÂÊÇ¶ÔIIC×ÜÏßµÄ²Ù×÷×Ó³ÌÐò***/
+  17          /*****************Æô¶¯×ÜÏß**********************/
+  18          void FDC2214IICStart(void)
+  19          {
+  20   1        FDC2214SCL=0;                  //
+  21   1        FDC2214SDA=1; 
+  22   1        nop;nop;  
+  23   1        
+  24   1        FDC2214SCL=1;
+  25   1        nop;nop;nop;nop;nop;nop;nop;//
+  26   1      
+  27   1        FDC2214SDA=0;
+  28   1        nop;nop;nop;nop;nop;nop;nop;
+  29   1        
+  30   1        FDC2214SCL=0;
+  31   1      
+  32   1                        //
+  33   1      }
+  34          
+  35          /*****************Í£Ö¹IIC×ÜÏß****************/
+  36          void FDC2214IICStop(void)
+  37          {
+  38   1        FDC2214SCL=0;                  //
+  39   1        FDC2214SDA=0; 
+  40   1        nop;nop;  
+  41   1          
+  42   1        FDC2214SCL=1;
+  43   1        nop;nop;nop;nop;nop;nop;nop;//
+  44   1      
+  45   1        FDC2214SDA=1;
+  46   1        nop;nop;nop;nop;nop;nop;nop;
+  47   1      
+  48   1        FDC2214SCL=0;
+  49   1      }
+  50          
+  51          
+  52          /***************¶ÔIIC×ÜÏß²úÉúÓ¦´ð*******************/
+  53          void FDC2214IICACK(void)
+  54          {
+C51 COMPILER V9.55   FDC2214                                                               10/28/2019 08:38:13 PAGE 2   
+
+  55   1        FDC2214SCL=0;                  
+  56   1        FDC2214SDA=0;//
+  57   1        nop;nop;
+  58   1      
+  59   1        FDC2214SCL=1;
+  60   1        nop;nop;nop;nop;nop;nop;nop;
+  61   1      
+  62   1        FDC2214SCL=0;
+  63   1      
+  64   1      }
+  65          
+  66          /**************¼ì²éÓ¦´ðÎ»*******************/
+  67          //µÈ´ýÓ¦´ðÐÅºÅµ½À´
+  68          //·µ»ØÖµ: 0,½ÓÊÜÓ¦´ðÊ§°Ü
+  69          //        1,½ÓÊÜÓ¦´ð³É¹¦
+  70          bit FDC2214IICReadAck(void)
+  71          {
+  72   1        unsigned char ucErrTime=0;
+  73   1      
+  74   1        FDC2214SCL=0;                  
+  75   1        FDC2214SDA=1;//¶ÁIOÏÈÖÃ¸ßµçÆ½ 
+  76   1        nop;nop;
+  77   1        nop;nop;  
+  78   1        FDC2214SCL=1;
+  79   1        nop;nop;nop;nop;
+  80   1      
+  81   1        while(FDC2214SDA==1)
+  82   1        {
+  83   2          ucErrTime++;
+  84   2          if(ucErrTime>100)
+  85   2          {
+  86   3      
+  87   3            FDC2214IICStop( );
+  88   3            return(0);//Î´½ÓÊÕµ½Ó¦´ð
+  89   3          }
+  90   2        }
+  91   1        nop;nop;  
+  92   1      
+  93   1        FDC2214SCL=0;
+  94   1        
+  95   1        //ÒÔÏÂnop²»¼Ó£¬²»ÄÜÕý³£Í¨Ñ¶ 
+  96   1        nop;nop;nop;nop;
+  97   1        nop;nop;
+  98   1        return(1);
+  99   1      }
+ 100          
+ 101          /*****************²»¶ÔIIC×ÜÏß²úÉúÓ¦´ð***************/
+ 102          void FDC2214IICNoAck(void)
+ 103          {
+ 104   1        
+ 105   1        FDC2214SCL=0;                  
+ 106   1        FDC2214SDA=1;//
+ 107   1        nop;nop;
+ 108   1        nop;nop;  
+ 109   1        FDC2214SCL=1;
+ 110   1        nop;nop;nop;nop;nop;nop;nop;
+ 111   1      
+ 112   1        FDC2214SCL=0;
+ 113   1      
+ 114   1      }
+ 115          
+ 116          /*******************ÏòIIC×ÜÏßÐ´Êý¾Ý*********************/
+C51 COMPILER V9.55   FDC2214                                                               10/28/2019 08:38:13 PAGE 3   
+
+ 117          void FDC2214IICSendByte(unsigned char sendbyte)
+ 118          {
+ 119   1        unsigned char data j=8;
+ 120   1      
+ 121   1        for(;j>0;j--)
+ 122   1        {
+ 123   2           FDC2214SCL=0;
+ 124   2           sendbyte<<=1;        //ÎÞÂÛC51ÔõÑùÊµÏÖÕâ¸ö²Ù×÷£¬Ê¼ÖÕ»áÊ¹CY=sendbyte^7;
+ 125   2           FDC2214SDA=CY;
+ 126   2           nop;nop;
+ 127   2           nop;nop;      
+ 128   2           FDC2214SCL=1;
+ 129   2           nop;nop;nop;nop;nop;nop;nop; 
+ 130   2             
+ 131   2        }
+ 132   1        FDC2214SCL=0;
+ 133   1       
+ 134   1      }
+ 135          
+ 136          /**********************´ÓIIC×ÜÏßÉÏ¶ÁÊý¾Ý×Ó³ÌÐò**********/
+ 137          unsigned char FDC2214IICReadByte(void)
+ 138          {
+ 139   1        unsigned char cReceiveData=0,i=8;
+ 140   1        FDC2214SCL=0;
+ 141   1        FDC2214SDA=1;//¶ÁIOÏÈÖÃ¸ßµçÆ½ 
+ 142   1        nop;nop;
+ 143   1        while(i--)
+ 144   1           {
+ 145   2             FDC2214SCL=1;
+ 146   2             nop;nop;nop;nop;
+ 147   2           
+ 148   2             cReceiveData=(cReceiveData<<1)|FDC2214SDA;
+ 149   2             FDC2214SCL=0;
+ 150   2             nop;nop;nop;nop;nop;nop
+ 151   2             nop;nop;nop;nop;nop;nop
+ 152   2             
+ 153   2           }
+ 154   1        return(cReceiveData);
+ 155   1      }
+ 156          
+ 157          
+ 158          //Á¬Ðø¶ÁµØÖ·Îª£ºRegisterAddressµÄ2¸ö×Ö½Ú
+ 159          unsigned int FDC2214Read2Bytes(unsigned char RegisterAddress)//
+ 160          {
+ 161   1        unsigned int RegisterData;//´æ·Å¶Áµ½µÄ2¸ö×Ö½Ú
+ 162   1        FDC2214IICStart(); //ÆôÊ¼ÐÅºÅ
+ 163   1        nop;nop;nop;nop;nop;nop 
+ 164   1        FDC2214IICSendByte((FDC2214_ADDR<<1)|0);//·¢ËÍÆ÷¼þµØÖ·+Ð´ÃüÁî
+ 165   1        if(FDC2214IICReadAck()==1)    //µÈ´ýÓ¦´ð
+ 166   1        {   
+ 167   2      
+ 168   2          FDC2214IICSendByte(RegisterAddress);  //Ð´¼Ä´æÆ÷µØÖ·
+ 169   2          if(FDC2214IICReadAck()==0) return(0);   //µÈ´ýÓ¦´ð
+ 170   2          
+ 171   2          FDC2214IICStart();
+ 172   2      
+ 173   2          FDC2214IICSendByte((FDC2214_ADDR<<1)|1);//·¢ËÍÆ÷¼þµØÖ·+¶ÁÃüÁî
+ 174   2          if(FDC2214IICReadAck()==0) return(0);   //µÈ´ýÓ¦´ð
+ 175   2      
+ 176   2          RegisterData=FDC2214IICReadByte()<<8;//¶ÁÈ¡Êý¾Ý
+ 177   2          FDC2214IICAck();  //·¢ËÍACK
+ 178   2          
+C51 COMPILER V9.55   FDC2214                                                               10/28/2019 08:38:13 PAGE 4   
+
+ 179   2          RegisterData|=FDC2214IICReadByte();  //¶ÁÈ¡Êý¾Ý
+ 180   2          FDC2214IICNoAck();  //·¢ËÍnACK
+ 181   2          
+ 182   2          FDC2214IICStop();     //²úÉúÒ»¸öÍ£Ö¹Ìõ¼þ
+ 183   2          return RegisterData;    
+ 184   2        }
+ 185   1        else//ÎÞÓ¦´ð£¬ÁÁ²âÊÔLED±¨¾¯
+ 186   1        {
+ 187   2      //    TestLed=0;
+ 188   2          return 0; 
+ 189   2          
+ 190   2        }
+ 191   1      }
+ 192          
+ 193          ///////////////////FDC2214ÉèÖÃº¯Êý////////////////////
+ 194          /* *IICÐ´2¸ö×Ö½Ú
+ 195           *RegisterAddress:¼Ä´æÆ÷µØÖ·
+ 196           *data1:Êý¾Ý1
+ 197           *data2:Êý¾Ý2
+ 198           *·µ»ØÖµ:1      Õý³£
+ 199           *       0  ´íÎó
+ 200          */
+ 201          bit FDC2214SetParameters(unsigned char RegisterAddress,unsigned char ParaMSB,unsigned char ParaLSB)
+ 202          { 
+ 203   1        FDC2214IICStart(); //ÆôÊ¼ÐÅºÅ
+ 204   1        FDC2214IICSendByte((FDC2214_ADDR<<1)|0);//·¢ËÍÆ÷¼þµØÖ·+Ð´ÃüÁî 
+ 205   1        if(FDC2214IICReadAck()==1)    //µÈ´ýÓ¦´ð
+ 206   1        {   
+ 207   2          FDC2214IICSendByte(RegisterAddress);  //Ð´¼Ä´æÆ÷µØÖ·
+ 208   2          if(FDC2214IICReadAck()==0) return(0);   //µÈ´ýÓ¦´ð
+ 209   2      
+ 210   2          FDC2214IICSendByte(ParaMSB);//·¢ËÍ¸ßÎ»Êý¾Ý
+ 211   2          if(FDC2214IICReadAck()==0) return(0);   //µÈ´ýÓ¦´ð
+ 212   2      
+ 213   2          FDC2214IICSendByte(ParaLSB);//·¢ËÍµÍÎ»Êý¾Ý
+ 214   2          if(FDC2214IICReadAck()==0) return(0);   //µÈ´ýÓ¦´ð
+ 215   2      
+ 216   2          FDC2214IICStop();     //²úÉúÒ»¸öÍ£Ö¹Ìõ¼þ
+ 217   2          return (1);   //·¢ËÍ³É¹¦£¬·µ»Ø1
+ 218   2        }
+ 219   1        else//ÎÞÓ¦´ð£¬ÁÁ²âÊÔLED±¨¾¯
+ 220   1        {
+ 221   2      //    TestLed=0;
+ 222   2          return 0; 
+ 223   2          
+ 224   2        } 
+ 225   1      }
+ 226          
+ 227          
+ 228          bit FDC2214Init(void)
+ 229          {
+ 230   1      
+ 231   1        unsigned int res;
+ 232   1        //¼ì²âIDÊÇ·ñÕýÈ·£¬ÔÙ³õÊ¼»¯¼Ä´æÆ÷
+ 233   1        res=FDC2214Read2Bytes(MANUFACTURER_ID);
+ 234   1        if(res==0x5449)
+ 235   1        {
+ 236   2      
+ 237   2      //    //ÉèÖÃFDC2214¼Ä´æÆ÷
+ 238   2          //ÉèÖÃFDC2214SetParameters¼Ä´æÆ÷
+ 239   2          FDC2214SetParameters(RCOUNT_CH0,0x34,0xFB);//²Î¿¼¼ÆÊý×ª»»¼ä¸ôÊ±¼ä(T=(RCOUNT_CH0*16)/Frefx)
+ 240   2          FDC2214SetParameters(RCOUNT_CH1,0x34,0xFB);
+C51 COMPILER V9.55   FDC2214                                                               10/28/2019 08:38:13 PAGE 5   
+
+ 241   2          FDC2214SetParameters(RCOUNT_CH2,0x34,0xFB);
+ 242   2          FDC2214SetParameters(RCOUNT_CH3,0x34,0xFB);
+ 243   2          
+ 244   2          FDC2214SetParameters(SETTLECOUNT_CH0,0x00,0x1B);//×ª»»Ö®Ç°µÄÎÈ¶¨Ê±¼ä(T=(SETTLECOUNT_CHx*16)/Frefx)
+ 245   2          FDC2214SetParameters(SETTLECOUNT_CH1,0x00,0x1B);
+ 246   2          FDC2214SetParameters(SETTLECOUNT_CH2,0x00,0x1B);
+ 247   2          FDC2214SetParameters(SETTLECOUNT_CH3,0x00,0x1B);
+ 248   2      
+ 249   2          FDC2214SetParameters(CLOCK_DIVIDERS_C_CH0,0x20,0x02);//Ñ¡ÔñÔÚ0.01MHz ~ 10MHzµÄ´«¸ÐÆ÷ÆµÂÊ
+ 250   2          FDC2214SetParameters(CLOCK_DIVIDERS_C_CH1,0x20,0x02);//Frefx = Fclk = 43.4MHz/2(2·ÖÆµ)
+ 251   2          FDC2214SetParameters(CLOCK_DIVIDERS_C_CH2,0x20,0x02);//CHx_REF_DIVIDER=2;CHx_FIN_SEL=2
+ 252   2          FDC2214SetParameters(CLOCK_DIVIDERS_C_CH3,0x20,0x02);
+ 253   2          
+ 254   2          FDC2214SetParameters(DRIVE_CURRENT_CH0,0x78,0x00);//0.146ma(´«¸ÐÆ÷½¨Á¢Ê±¼ä+×ª»»Ê±¼äµÄÇý¶¯µçÁ÷)
+ 255   2          FDC2214SetParameters(DRIVE_CURRENT_CH1,0x78,0x00);
+ 256   2          FDC2214SetParameters(DRIVE_CURRENT_CH2,0x78,0x00);
+ 257   2          FDC2214SetParameters(DRIVE_CURRENT_CH3,0x78,0x00);
+ 258   2          
+ 259   2          FDC2214SetParameters(ERROR_CONFIG,0x00,0x00);//È«²¿½ûÖ¹´íÎó±¨¸æ
+ 260   2          //FDC2214SetParameters(MUX_CONFIG,0x52,0x0D);
+ 261   2          FDC2214SetParameters(MUX_CONFIG,0xC2,0x0D);//Í¨µÀ0,1,2 ,3;Ñ¡Ôñ10MhzÎª³¬¹ýÕðµ´²ÛÕðµ´ÆµÂÊµÄ×îµÍÉèÖÃ£¬¶àÍ¨µ
+             -À£¬ËÄÍ¨µÀ
+ 262   2          
+ 263   2          FDC2214SetParameters(CONFIG,0x14,0x01);//¼¤»îÄ£Ê½£¬Ê¹ÓÃÄÚ²¿Õñµ´Æ÷×ö²Î¿¼ÆµÂÊ£¬INTBÒý½Å»áËæ×´Ì¬¼Ä´æÆ÷¸üÐÂ±
+             -»ÖÃÎ»
+ 264   2      //    FDC2214SetParameters(CONFIG,0x15,0x01);//¼¤»îÄ£Ê½£¬Ê¹ÓÃÍâ½Ó40MÓÐÔ´¾§Õñ×ö²Î¿¼ÆµÂÊ
+ 265   2      
+ 266   2        }
+ 267   1        else 
+ 268   1        {
+ 269   2          return 0;
+ 270   2        }
+ 271   1        return 1;
+ 272   1      
+ 273   1      }
+ 274          
+ 275          unsigned long FCD2214ReadCH(unsigned char index)
+ 276          {
+ 277   1        unsigned long xdata result;
+ 278   1        switch(index)
+ 279   1        {
+ 280   2          case 0:
+ 281   2            result = FDC2214Read2Bytes(DATA_CH0)&0x0FFF;
+ 282   2            result = (result<<16)|(FDC2214Read2Bytes(DATA_LSB_CH0));
+ 283   2            break;
+ 284   2          case 1:
+ 285   2            result = FDC2214Read2Bytes(DATA_CH1)&0x0FFF;
+ 286   2            result = (result<<16)|(FDC2214Read2Bytes(DATA_LSB_CH1));
+ 287   2          break;
+ 288   2          case 2:
+ 289   2            result = FDC2214Read2Bytes(DATA_CH2)&0x0FFF;
+ 290   2            result = (result<<16)|(FDC2214Read2Bytes(DATA_LSB_CH2));
+ 291   2          break;
+ 292   2          case 3:
+ 293   2            result = FDC2214Read2Bytes(DATA_CH3)&0x0FFF;
+ 294   2            result = (result<<16)|(FDC2214Read2Bytes(DATA_LSB_CH3));
+ 295   2          break;
+ 296   2          default:break;
+ 297   2        }
+ 298   1        result =result & 0x0FFFFFFF;
+ 299   1        return result;
+ 300   1      }
+C51 COMPILER V9.55   FDC2214                                                               10/28/2019 08:38:13 PAGE 6   
+
+ 301          
+ 302          unsigned long FilteredFCD2214ReadCH(unsigned char index)//¶Ô¶ÁÈ¡Öµ¾ºÈü·¨ÂË²¨
+ 303          {
+ 304   1        unsigned char i=0;
+ 305   1        unsigned long xdata temp[6]=0,longSum=0,tempMax=0,tempMin=0;
+ 306   1      
+ 307   1        for(i=0;i<=5;i++) 
+ 308   1        {
+ 309   2          temp[i]=(FCD2214ReadCH(index) | 0x000003FF) & 0xFFFFFC00;//È¡¸ß18Î»
+ 310   2          Delay1ms();   
+ 311   2        }
+ 312   1        longSum=temp[0];
+ 313   1        tempMax=temp[0];
+ 314   1        tempMin=temp[0];
+ 315   1        for(i=1;i<=5;i++)
+ 316   1        {
+ 317   2          if(tempMax<temp[i])tempMax=temp[i];//¼ÇÂ¼×îÖµ
+ 318   2          if(tempMin>temp[i])tempMin=temp[i];//¼ÇÂ¼×îÐ¡Öµ
+ 319   2          longSum=temp[i]+longSum;//ÀÛ¼Ó
+ 320   2          
+ 321   2        }
+ 322   1      
+ 323   1        return((longSum-tempMax-tempMin)/4);//6¸öÖµ£¬È¥³ý×î´óÖµ£¬È¥³ý×îÐ¡Öµ£¬ÆäÓà4¸öÖµÈ¡Æ½¾ù
+ 324   1      }
+ 325          
+ 326          
+ 327          float Cap_Calculate(unsigned char index)//¼ÆËãµçÈÝÖµ
+ 328          {
+ 329   1      
+ 330   1        longFDC2214Data = FCD2214ReadCH(index);
+ 331   1      
+ 332   1      //  Cap = 56645.763f/((float)longFDC2214Data);
+ 333   1      //  return ((Cap*Cap)-33);
+ 334   1          //Cap = 232021045.248/(longFDC2214Data);
+ 335   1        longFDC2214Data=longFDC2214Data/1000;
+ 336   1        return (longFDC2214Data);//return (longFDC2214Data);
+ 337   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1183    ----
+   CONSTANT SIZE    =     24    ----
+   XDATA SIZE       =   ----      40
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,390 @@
+C51 COMPILER V9.55   MAIN                                                                  09/29/2019 20:46:26 PAGE 1   
+
+
+C51 COMPILER V9.55, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE INCDIR(..\SYSTEM;..\HARDWARE;..\USER) DE
+                    -BUG OBJECTEXTEND PRINT(.\Listings\main.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          //EEPROMÉèÎª1K£¬Ç°512×Ö½Ú£¨0-0x1FF£©´æ·ÅĞ£×¼ºóµÄÊı¾İ,ºó512×Ö½Ú(0x200-0x3FF)´æ·Å³ö³§Êı¾İ
+   2          
+   3          #include  "config.h"
+   4          #include  "Serial.h"//´®¿Ú1(P3.0/RxD, P3.1/TxD)
+   5          #include <myself.h>
+   6          #include  "AD.h"
+   7          #include  "FDC2214.h"
+   8          #include "stdio.h"
+   9          #include "oled.h"
+  10          #include  "STC8EEPROM.h"
+  11          #define ShortCircuitValue 0x05000000//Á½¼«°å¶ÌÂ·µÄÅĞ¶ÏãĞÖµ
+  12          unsigned long xdata FDC2214CalibrateValue[170];//ÓÃÓÚ·ÅĞ£×¼µÄÖµ
+  13          sbit Beep=P1^2;
+  14          
+  15          void main()
+  16          {
+  17   1        extern bit bS1Rec;//´®¿Ú½ÓÊÕµ½Êı¾İ±êÖ¾
+  18   1        extern bit bFlag2ms;//2ms±êÖ¾ 
+  19   1        extern bit bFlagAD;//AD×ª»»±êÖ¾ 
+  20   1        extern unsigned char cS1Rec;//´®¿Ú½ÓÊÕµ½×Ö·û
+  21   1        extern unsigned char cADCResult;//AD¸ß8Î» 
+  22   1        extern unsigned long xdata FDC2214ThresholdValue[171];//¸÷ÊıÁ¿Ö½ÕÅ¶ÔÓ¦µãµÄÖĞµãÖµ×÷ÎªãĞÖµ
+  23   1      
+  24   1        extern bit bFlagReflashFDC2214;//ÓÃÓÚµÚ1ÆÁ¸÷Í¨µÀÖµÏÔÊ¾Ë¢ĞÂÔÊĞí
+  25   1        unsigned char xdata cJudgeKey;
+  26   1      //  unsigned char xdata cKeyPressNum;//ÎåÏò°´¼ü¼üÖµ
+  27   1        unsigned char xdata cKeyPressNumber=6;  
+  28   1      //  bit TestKeyLastTime=TestKey;
+  29   1      //  bit tempTestKey=0;
+  30   1        unsigned long xdata FDC2214CH[4]={0,0,0,0}; 
+  31   1      //  unsigned char xdata cIndexOfCalibrate[170];//ÓÃÓÚÖ¸Ê¾±»Ğ£×¼µÄµã£¬Î´²¹Ğ£×¼Îª0£¬²¹Ğ£×¼¹ıÎª1£¬ÒòÎª¿ÉÎ»Ñ°Ö·
+             -µ¥ÔªÖ»ÓĞ128Î»£¬ËùÒÔÖ»ÄÜÀûÓÃ8KµÄRAMµ¥Ôª
+  32   1        unsigned char xdata i=0,cCalibrateNum=0;//Ğ£×¼¹¦ÄÜÖĞÏÔÊ¾µÄÕÅÊı
+  33   1        
+  34   1        unsigned char* xdata cindexTemp=0;
+  35   1        unsigned int xdata intTemp=0,cMeasureNum=255; //²âÁ¿¹¦ÄÜÖĞÏÔÊ¾µÄÕÅÊı
+  36   1        bit bFunctionIndex=0;//¹¦ÄÜÖ¸Ê¾±êÖ¾£¬0ÎªĞ£×¼£¬1Îª²âÊÔ
+  37   1        bit bIndicatorIcon=0; //¹¦ÄÜÍ¼±êÑùÊ½£¬0Îª¿ÕĞÄÔ²£¬1ÎªÊµĞÄÔ²£¬¾ÍÊÇºº×Ö±íË÷Òı18+bIndicatorIcon
+  38   1        bit bShowPaperNum=0;//ÏÔÊ¾²âÊÔÖ½ÕÅÊıÁ¿±êÖ¾
+  39   1        bit bReCalibrate=0;//ÔÚĞ£×¼Ñ¡ÏîÖĞ°´ÏÂ¹ıÖĞ¼ä¼üÈ·ÈÏ£¬ËµÃ÷Ğ£×¼Êı¾İÓĞ¸Ä±ä£¬´ËÎ»Îª1
+  40   1        bit bSelectSaveItOrNot=0;//Àë¿ªĞ£×¼Ñ¡ÏîÊ±£¬ÏÔÊ¾È·ÈÏÊÇ·ñÒª±£´æÊı¾İ½çÃæ
+  41   1        bit bSaveCalibrateData=0;//±£´æĞ£×¼Êı¾İ
+  42   1        bit bCalibrateDataReset=0;//Ğ£×¼Êı¾İ»Ö¸´³ö³§ÉèÖÃ±êÖ¾
+  43   1        
+  44   1        bFlag2ms=0;
+  45   1        cJudgeKey=0x00;
+  46   1        
+  47   1        P5M0 = 0x00;                                //ÉèÖÃP5.4Îª¸ß×èÊäÈë
+  48   1        P5M1 = 0x10;    
+  49   1      
+  50   1        DelayNms110592M(1);//¿Õµ÷ÓÃ£¬±ÜÃâÕ¼ÓÃµÍ128×Ö½ÚµÄData¿Õ¼ä
+  51   1        SysClkInit();
+  52   1        Uart1Init();//´®¿Ú1³õÊ¼»¯
+  53   1        Timer0Init();//¶¨Ê±Æ÷0³õÊ¼»¯
+C51 COMPILER V9.55   MAIN                                                                  09/29/2019 20:46:26 PAGE 2   
+
+  54   1        ADCInit();
+  55   1        FDC2214Init();
+  56   1        OLED_Init();      //³õÊ¼»¯OLED  
+  57   1        OLED_Clear() ;  
+  58   1        EEPROMInit()  ;//¿Õº¯Êı£¬»¹Î´Íê³É
+  59   1      //  S1SendData(0x55);//´®¿Ú1 HEXÄ£Ê½·¢ËÍ²âÊÔ
+  60   1      //  for(i=0;i<170;i++)//Á¬Ğø¶ÁÈë3¸ö×Ö½Ú£¬ÒÆÎ»³É24Î»£¬¸³¸øunsigned longĞÍFDC2214ThresholdValue[i]
+  61   1      //  {
+  62   1      //    S1SendData(FDC2214ThresholdValue[i]>>16); 
+  63   1      //    S1SendData(FDC2214ThresholdValue[i]>>8); 
+  64   1      //    S1SendData(FDC2214ThresholdValue[i]);     
+  65   1      //    
+  66   1      //    S1SendData(0x55); 
+  67   1      //    
+  68   1      //  } 
+  69   1          
+  70   1          
+  71   1      //**********¼ì²âÓĞÃ»ÓĞÁ¬½ÓºÃFDC2214***************
+  72   1        intTemp=FDC2214Read2Bytes(MANUFACTURER_ID);
+  73   1        while(intTemp!=0x5449)
+  74   1        {
+  75   2            OLED_ShowString(0,0,"Have no FDC2214!",16);
+  76   2            OLED_ShowString(0,2,"Please connect",16);   
+  77   2            OLED_ShowString(0,4,"it correctly!",16);      
+  78   2            intTemp=FDC2214Read2Bytes(MANUFACTURER_ID);
+  79   2        }
+  80   1      //************************************************
+  81   1      
+  82   1        OLED_PaperNumTitle(); 
+  83   1      
+  84   1        while(1)
+  85   1        {   
+  86   2            if(bFlagAD==1)//¼ì²â°´¼ü
+  87   2            {
+  88   3              bFlagAD=0;
+  89   3              cKeyPressNumber=JudgeKeyNum(cADCResult);//¶ÁÈ¡°´¼üÖµ
+  90   3        //      S1SendData(cKeyPressNum);              //°´¼üÖµ·¢ËÍµ½´®¿Ú 
+  91   3            } 
+  92   2      
+  93   2            if(cKeyPressNumber<0x06)//ÓĞ¼ü°´ÏÂ
+  94   2            {
+  95   3              switch(cKeyPressNumber) //¸ù¾İ°´¼üÖ´ĞĞ 
+  96   3              { 
+  97   4                case 0:// KeyStartStop    
+  98   4                {
+  99   5                  //°´¼ü³¬¹ı3Ãë£¬»Ö¸´Ô­Ê¼Ğ£×¼Êı¾İ
+ 100   5                  //Òª¼Ó3ÃëÅĞ¶Ï
+ 101   5                  bCalibrateDataReset=1;//»Ö¸´Ô­Ê¼Ğ£×¼Êı¾İ±êÖ¾
+ 102   5      
+ 103   5                  //S1SendData(0x00);
+ 104   5      
+ 105   5                  break;//´®¿Ú·¢ËÍ  ;       
+ 106   5                }
+ 107   4                  
+ 108   4                case 1://KeyDown
+ 109   4                {
+ 110   5                  if(bFunctionIndex==0)//ÔÚĞ£×¼¹¦ÄÜÖĞ£¬°´ÏòÏÂ¼ü
+ 111   5                  {
+ 112   6      
+ 113   6                    if(bReCalibrate==1)//Èç¹ûĞ£×¼¹ıÊı¾İ£¬ËµÃ÷Ğ£×¼½áÊø£¬Ìø³ö¶Ô»°¿ò£¬ÒªÇóÈ·ÈÏÊÇ·ñ±£´æĞ£×¼Êı¾İ£¬
+ 114   6                    {
+ 115   7                    
+C51 COMPILER V9.55   MAIN                                                                  09/29/2019 20:46:26 PAGE 3   
+
+ 116   7                      bSelectSaveItOrNot=1;//ÊÇ·ñÏÔÊ¾±£´æÑ¡Ôñ¿ò±êÖ¾
+ 117   7                  //    cCalibrateNum=0;//Ğ£×¼¹¦ÄÜÖĞÊı×Ö¹é0
+ 118   7                    
+ 119   7                    }
+ 120   6                    else//Èç¹ûÃ»ÓĞĞ£×¼¹ıÊı¾İ£¬¾ÍÖ±½ÓÓÃÒÔÇ°µÄĞ£×¼Êı¾İ²âÁ¿
+ 121   6                      bFunctionIndex=1;//¹â±êÒÆµ½²âÁ¿Ñ¡Ïî
+ 122   6                  }
+ 123   5                  
+ 124   5                  //S1SendData(0x01);//´®¿Ú·¢ËÍ ; 
+ 125   5      
+ 126   5                  break;
+ 127   5                }
+ 128   4                case 2:// KeyMiddle 
+ 129   4                {
+ 130   5                  if(bFunctionIndex==0)//ÔÚĞ£×¼¹¦ÄÜÖĞ
+ 131   5                  {
+ 132   6                    bReCalibrate=1;
+ 133   6                    
+ 134   6      
+ 135   6                  }
+ 136   5                  else////²Ëµ¥Ñ¡ÔñÎª¼ÆÊı²Ù×÷
+ 137   5                  {
+ 138   6                    bShowPaperNum=1;
+ 139   6                  }
+ 140   5                  
+ 141   5                  bIndicatorIcon=1;//¹¦ÄÜÍ¼±êÑùÊ½¸ÄÎªÊµĞÄÔ²¡£Èç¹ûÔÚĞ£×¼ÖĞ£¬±íÊ¾µ±Ç°Êı¾İÒÑĞ£×¼£»Èç¹ûÔÚ²âÁ¿ÖĞ£¬±íÊ¾ÒÑÈ·È
+             -ÏÏÔÊ¾ÕÅÊı
+ 142   5                  //S1SendData(0x02);//´®¿Ú·¢ËÍ ; 
+ 143   5                  break;
+ 144   5                }
+ 145   4                case 3:// KeyRight
+ 146   4                {
+ 147   5                  if(bFunctionIndex==0 & cCalibrateNum<255)//²Ëµ¥Ñ¡ÔñÎªĞ£×¼²Ù×÷
+ 148   5                  {
+ 149   6                    cCalibrateNum++;
+ 150   6                  }
+ 151   5        //          S1SendData(0x03);//´®¿Ú·¢ËÍ ; 
+ 152   5                  bIndicatorIcon=0;//ÏÔÊ¾¿ÕĞÄÔ²£¬±íÊ¾µ±Ç°Êı¾İµãÎ´¼ÇÂ¼Ğ£×¼Öµ         
+ 153   5                  break;
+ 154   5      
+ 155   5                }
+ 156   4                case 4:// KeyLeft
+ 157   4                {
+ 158   5                  if(bFunctionIndex==0 & cCalibrateNum>0)//²Ëµ¥Ñ¡ÔñÎªĞ£×¼²Ù×÷
+ 159   5                  {
+ 160   6                    cCalibrateNum--;
+ 161   6                  }
+ 162   5        //          S1SendData(0x04);
+ 163   5                  bIndicatorIcon=0;//ÏÔÊ¾¿ÕĞÄÔ²£¬±íÊ¾µ±Ç°Êı¾İµãÎ´¼ÇÂ¼Ğ£×¼Öµ
+ 164   5                  break;//´®¿Ú·¢ËÍ  ;  
+ 165   5                  
+ 166   5                }
+ 167   4                case 5:// KeyUp
+ 168   4                {
+ 169   5                  //S1SendData(0x05);//´®¿Ú·¢ËÍ ; 
+ 170   5                  if(bFunctionIndex==1) //µ±Ç°ÔÚ²âÁ¿¹¦ÄÜ
+ 171   5                  {
+ 172   6                    bFunctionIndex=0;
+ 173   6                    bShowPaperNum=0;
+ 174   6                  //  cCalibrateNum=0;//Ğ£×¼¹¦ÄÜÖĞÊı×Ö¹é0
+ 175   6                    bIndicatorIcon=0;//ÏÔÊ¾¿ÕĞÄÔ²£¬±íÊ¾µ±Ç°Êı¾İµãÎ´¼ÇÂ¼Ğ£×¼Öµ             
+ 176   6                  }
+C51 COMPILER V9.55   MAIN                                                                  09/29/2019 20:46:26 PAGE 4   
+
+ 177   5                  else;//ÔÚĞ£×¼¹¦ÄÜÖĞ
+ 178   5                  break;
+ 179   5                }
+ 180   4                default:
+ 181   4                break;//
+ 182   4              } 
+ 183   3              cKeyPressNumber=0x06;//¶Á¼üÖµ½áÊøºó¼´Ä¬ÈÏ°´¼üÌ§Æğ
+ 184   3            }
+ 185   2        
+ 186   2            
+ 187   2            
+ 188   2            
+ 189   2            
+ 190   2          
+ 191   2            if(bFlagReflashFDC2214)//Ã»ÓĞ°´¼ü°´ÏÂÊ±£¬Ë¢ĞÂÏÔÊ¾£»ÓĞ¼ü°´ÏÂÊ±£¬OLED²»Ë¢ĞÂ¡£ÕâÑù´¦ÀíÊÇÓÉÓÚOLEDË¢ĞÂºÍ¶ÁÈ¡
+             -FDC2214Õ¼ÓÃCPUÊ±¼ä£¬°´¼üÏìÓ¦²»Á÷³©
+ 192   2            {
+ 193   3              if(bCalibrateDataReset==1)//»Ö¸´Ô­Ê¼Ğ£×¼Êı¾İ±êÖ¾
+ 194   3              {
+ 195   4      
+ 196   4                bCalibrateDataReset=0;
+ 197   4                IapProgram(0x3FF, 0xFF);//Çå³ıEEPROM±êÖ¾Î»          
+ 198   4                IAP_CONTR |= 0x60;//¸´Î»
+ 199   4                bIndicatorIcon=0;
+ 200   4                //ÏÔÊ¾Ò²Òª´¦Àí+++++++++++++++++
+ 201   4              }
+ 202   3              if(bSelectSaveItOrNot==1)//ÏÔÊ¾±£´æÊı¾İÑ¡Ôñ½çÃæ£¬ÔÚĞ£×¼Ñ¡ÏîÖĞÀë¿ª£¬ĞèÒª±£´æĞ£×¼Êı¾İ
+ 203   3              {
+ 204   4                OLED_ShowString(0,2,"                ",16);//²Á³ı2,3,4ĞĞÏÔÊ¾
+ 205   4                OLED_ShowString(0,4,"                ",16);//     
+ 206   4                OLED_ShowString(0,6,"                ",16);//   
+ 207   4      
+ 208   4                //µ÷ÓÃ±£´æĞ£×¼Êı¾İµÄ½çÃæ
+ 209   4                OLED_ShowCHinese(0,2,21); //ÊÇ      
+ 210   4                OLED_ShowCHinese(16,2,22);//·ñ
+ 211   4                OLED_ShowCHinese(32,2,23);//±£  
+ 212   4                OLED_ShowCHinese(48,2,24);//´æ  
+ 213   4                OLED_ShowCHinese(64,2,3); //Êı
+ 214   4                OLED_ShowCHinese(80,2,25);//¾İ  
+ 215   4                OLED_ShowString(96,2,"?",16);//?
+ 216   4                OLED_ShowCHinese(16,6,21);            
+ 217   4                OLED_ShowCHinese(64,6,27);
+ 218   4      
+ 219   4                while(cKeyPressNumber!=0x02)//µÈ´ıÈ·ÈÏ±£´æ»ò²»±£´æ
+ 220   4                {
+ 221   5                  if(bFlagAD==1)
+ 222   5                  {
+ 223   6                    bFlagAD=0;
+ 224   6                    cKeyPressNumber=JudgeKeyNum(cADCResult);//¶ÁÈ¡°´¼üÖµ
+ 225   6                //S1SendData(cKeyPressNum);              //°´¼üÖµ·¢ËÍµ½´®¿Ú 
+ 226   6                  
+ 227   6                  } 
+ 228   5      
+ 229   5                  if(cKeyPressNumber==4)//Ïò×ó¼ü
+ 230   5                  {
+ 231   6                      OLED_ShowCHinese(16,6,26);            
+ 232   6                      OLED_ShowCHinese(64,6,22);
+ 233   6                      bSaveCalibrateData=1;//±£´æ
+ 234   6      //                bFunctionIndex=1;//Ö¸Ê¾¹â±êÇĞ»»µ½²âÊÔĞĞ
+ 235   6                  }
+ 236   5                  else if(cKeyPressNumber==3)//ÏòÓÒ¼ü
+ 237   5                  {
+C51 COMPILER V9.55   MAIN                                                                  09/29/2019 20:46:26 PAGE 5   
+
+ 238   6                      OLED_ShowCHinese(16,6,21);            
+ 239   6                      OLED_ShowCHinese(64,6,27);
+ 240   6                      bSaveCalibrateData=0;//²»±£´æ
+ 241   6        //              bFunctionIndex=0;//Ö¸Ê¾¹â±êÔÚĞ£×¼Ïî
+ 242   6                  } 
+ 243   5                  
+ 244   5                }           
+ 245   4        
+ 246   4                if(bSaveCalibrateData==1)
+ 247   4                {
+ 248   5            
+ 249   5                  cCalibrateNum=0;//ÏÔÊ¾µÄĞ£×¼ÕÅÊı¹é0
+ 250   5                  //+++++++++++++¸ù¾İĞ£×¼Êı¾İFDC2214CalibrateValue[]Ëã³öãĞÖµ±£´æµ½FDC2214ThresholdValue[170]
+ 251   5                  //ºÍEEPROMÖĞ
+ 252   5                  
+ 253   5                  EEPROMSave();     //  ½«Ğ£×¼Êı¾İ±£´æµ½EEPROMµÚÒ»Ò³Ãæ    
+ 254   5                
+ 255   5                }
+ 256   4                
+ 257   4                cKeyPressNumber=0x06;//¶Á¼üÖµ½áÊøºó¼´Ä¬ÈÏ°´¼üÌ§Æğ
+ 258   4                bFunctionIndex=0;//µ±Ç°Ö¸ÏòĞ£×¼Ïî
+ 259   4                bSelectSaveItOrNot=0;//²»ÔÙÏÔÊ¾±£´æ¶Ô»°¿ò
+ 260   4                bReCalibrate=0; //Çå±êÖ¾        
+ 261   4                
+ 262   4                OLED_PaperNumTitle();//»Ö¸´ÏÔÊ¾Ö÷½çÃæ
+ 263   4                bIndicatorIcon=0;//ÏÔÊ¾¿ÕÈ¦   
+ 264   4                
+ 265   4              }
+ 266   3              else//ÏÔÊ¾Õı³£Ö÷½çÃæ  
+ 267   3              {
+ 268   4            
+ 269   4                FDC2214CH[1]=FCD2214ReadCH(1);
+ 270   4      //            S1SendData(FDC2214CH[1]>>24);
+ 271   4      //            S1SendData(FDC2214CH[1]>>16);           
+ 272   4      //            S1SendData(FDC2214CH[1]>>8);  
+ 273   4      //            S1SendData(FDC2214CH[1]); 
+ 274   4                if(FDC2214CH[1]>=ShortCircuitValue)//FDC2214¶ÌÂ·
+ 275   4                {
+ 276   5                  Beep=0; 
+ 277   5                  OLED_Clear();
+ 278   5      
+ 279   5                  OLED_ShowCHinese(0,0,8);    //¶ÌÂ·ÌáÊ¾    
+ 280   5                  OLED_ShowCHinese(16,0,9); 
+ 281   5                  
+ 282   5                  do
+ 283   5                  {
+ 284   6                    FDC2214CH[1]=FilteredFCD2214ReadCH(1);
+ 285   6                    
+ 286   6                  }while(FDC2214CH[1]>=ShortCircuitValue);//³ÌĞòÍ£ÔÚÕâÀïÖ±µ½¶ÌÂ·½â³ı
+ 287   5                  Beep=1;
+ 288   5                  if(FDC2214CH[1]<ShortCircuitValue)OLED_PaperNumTitle();//ÖØĞÂÏÔÊ¾Ô­À´µÄ½çÃæ             
+ 289   5                }
+ 290   4                else//FDC2214¼«°å²»¶ÌÂ·
+ 291   4                {
+ 292   5                  OLED_ShowString(34,6,Hex2ASCII(FDC2214CH[1]),16); //×îºóÒ»ĞĞÏÔÊ¾µ±Ç°FDC2214½á¹û£¬×ª»»³É8Î»Ê®Áù½øÖÆÏÔ
+             -Ê¾
+ 293   5                  if(bFunctionIndex==0 )//ÔÚĞ£×¼¹¦ÄÜÖĞ£¬
+ 294   5                  {
+ 295   6                     if(bReCalibrate==1)//ÇÒÓĞÊı¾İ±»Ğ£×¼
+ 296   6                     {
+ 297   7                    //+++++++++¶ÁÈ¡FDC2214Öµ£¬ÒÔcCalibrateNumÎªÏÂ±ê£¬´æÈëÊı×é+++++++++++++      
+ 298   7                       FDC2214CalibrateValue[cCalibrateNum]=FilteredFCD2214ReadCH(1);//±£´æ¶ÁÈë¾­¹ıÂË²¨µÄĞ£×¼Öµ
+C51 COMPILER V9.55   MAIN                                                                  09/29/2019 20:46:26 PAGE 6   
+
+ 299   7                     }
+ 300   6                     OLED_ShowString(48,2,Hex2ASCII3Figure(cCalibrateNum),16);  //ÏÔÊ¾Ğ£×¼ÕÅÊı               
+ 301   6                     OLED_ShowCHinese(112,4,20);  //¸ù¾İµ±Ç°¹¦ÄÜ±êÖ¾£¬²Á³ıÔ­À´Ô²È¦¹â±ê  
+ 302   6                     OLED_ShowCHinese(112,2,18+(bIndicatorIcon?1:0)); //¸ù¾İbIndicatorIconÖµ£¬Îª1ÏÔÊ¾ÊµÔ²È¦£¬Îª0ÏÔÊ¾¿ÕÔ
+             -²È¦
+ 303   6                     OLED_ShowString(48,4,"   ",16);//²Á³ı²âÁ¿¹¦ÄÜÉÏÏÔÊ¾µÄÕÅÊı
+ 304   6                  }
+ 305   5                  else//ÔÚ²âÁ¿¹¦ÄÜÖĞ£¬
+ 306   5                  {
+ 307   6                    
+ 308   6                    if(bShowPaperNum==1)//ÏÔÊ¾²âÁ¿ÕÅÊı
+ 309   6                    {
+ 310   7                      //++++++++++++++++
+ 311   7                      //+++++++++++++++++
+ 312   7                      //¸ù¾İFDC2214CH[1]ÅĞ¶ÏÕÅÊı£¬
+ 313   7                      
+ 314   7                      cMeasureNum=JudgePaperNum(FilteredFCD2214ReadCH(1));
+ 315   7                      bIndicatorIcon=1;             
+ 316   7                      P55=0;
+ 317   7                      OLED_ShowString(48,4,"   ",16);//²Á³ıÏÔÊ¾µÄÕÅÊı
+ 318   7                      OLED_ShowCHinese(112,4,18+(bIndicatorIcon?1:0));  //¸ù¾İbIndicatorIconÖµ£¬Îª1ÏÔÊ¾ÊµÔ²È¦£¬Îª0ÏÔÊ¾¿Õ
+             -Ô²È¦                  
+ 319   7                      DelayNms24MHz(500);
+ 320   7                      //+++++++++++++++ÏÔÊ¾¼ÆÊıÕÅÊı£¬µ÷ÓÃÉùÒôÌáÊ¾++++++++++++++++++
+ 321   7                      
+ 322   7                      OLED_ShowString(48,4,Hex2ASCII3Figure(cMeasureNum),16);   //ÏÔÊ¾²âÁ¿ÕÅÊı  
+ 323   7                      P55=1;
+ 324   7                      bIndicatorIcon=0;
+ 325   7                      bShowPaperNum=0;
+ 326   7                    }
+ 327   6                    OLED_PaperNumTitle();//ÖØĞÂÏÔÊ¾Ô­À´µÄ½çÃæ                 
+ 328   6                    OLED_ShowCHinese(112,2,20); //¸ù¾İµ±Ç°¹¦ÄÜ±êÖ¾£¬²Á³ıÔ­À´Ô²È¦¹â±ê  
+ 329   6                    OLED_ShowCHinese(112,4,18+(bIndicatorIcon?1:0));  //¸ù¾İbIndicatorIconÖµ£¬Îª1ÏÔÊ¾ÊµÔ²È¦£¬Îª0ÏÔÊ¾¿ÕÔ²
+             -È¦                                  
+ 330   6                  
+ 331   6      
+ 332   6                  }
+ 333   5                }
+ 334   4                  
+ 335   4                    
+ 336   4                    
+ 337   4                    
+ 338   4      
+ 339   4              }
+ 340   3            }
+ 341   2        }
+ 342   1      }
+ 343          
+ 344          
+ 345          
+ 346          
+ 347          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1021    ----
+   CONSTANT SIZE    =     85    ----
+   XDATA SIZE       =    680      27
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       7
+C51 COMPILER V9.55   MAIN                                                                  09/29/2019 20:46:26 PAGE 7   
+
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
